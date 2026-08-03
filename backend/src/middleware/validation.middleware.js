@@ -1,23 +1,24 @@
-import { ZodError } from "zod";
+import ApiError from "../utils/ApiError.js";
 
-export const validate = (schema) => {
+const validate = (schema) => {
   return (req, res, next) => {
-    try {
-      req.body = schema.parse(req.body);
-      next();
-    } catch (error) {
-      if (error instanceof ZodError) {
-        return res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: error.issues.map((issue) => ({
-            field: issue.path.join("."),
-            message: issue.message,
-          })),
-        });
-      }
+    const { error, value } = schema.validate(req.body, {
+      abortEarly: false,
+      allowUnknown: false,
+      stripUnknown: true,
+    });
 
-      next(error);
+    if (error) {
+      const errors = error.details.map((detail) => detail.message);
+
+      throw new ApiError(400, "Validation failed", errors);
     }
+
+    // Replace request body with sanitized data
+    req.body = value;
+
+    next();
   };
 };
+
+export default validate;
