@@ -11,13 +11,27 @@ const app = express();
 // Security
 app.use(helmet());
 
+
 // CORS
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin(origin, callback) {
+      const allowedOrigins = [
+        process.env.CLIENT_URL,
+      ];
+
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
   })
 );
+
+
+
 
 // Body Parser
 app.use(express.json());

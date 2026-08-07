@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
+console.log("CLIENT_URL:", JSON.stringify(process.env.CLIENT_URL));
 
 import app from "./app.js";
 import connectDB from "./config/database.js";
