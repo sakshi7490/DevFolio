@@ -2,37 +2,48 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
-import cookieParser from "cookie-parser";
+
+import routes from "./routes/index.js";
+import { errorMiddleware } from "./middleware/error.middleware.js";
 
 const app = express();
 
+// Security
+app.use(helmet());
+
+
+// CORS
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin(origin, callback) {
+      const allowedOrigins = [
+        process.env.CLIENT_URL,
+      ];
+
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
   })
 );
 
-app.use(helmet());
+
+
+
+// Body Parser
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Logger
 app.use(morgan("dev"));
 
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
-app.use(cookieParser());
+// API Routes
+app.use("/api/v1", routes);
 
-app.get("/", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "Portfolio Builder API is running",
-  });
-});
-
-app.get("/api/health", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "Server is healthy",
-    timestamp: new Date().toISOString(),
-  });
-});
+// Error Middleware
+app.use(errorMiddleware);
 
 export default app;
