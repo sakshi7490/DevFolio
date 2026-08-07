@@ -1,21 +1,21 @@
 import dotenv from "dotenv";
-
 dotenv.config();
+console.log("CLIENT_URL:", JSON.stringify(process.env.CLIENT_URL));
 
 import app from "./app.js";
-import { connectDatabase } from "./config/database.js";
+import connectDB from "./config/database.js";
 
 const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
   try {
-    await connectDatabase();
+    await connectDB();
 
     app.listen(PORT, () => {
-      console.log(`Server is running on http://localhost:${PORT}`);
+      console.log(`Server is running on port ${PORT}`);
     });
   } catch (error) {
-    console.error(`Unable to start server: ${error.message}`);
+    console.error("Failed to start server:", error.message);
     process.exit(1);
   }
 };
