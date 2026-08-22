@@ -15,3 +15,14 @@ export const findUserByEmailWithPassword = async (email) => {
 export const findUserById = async (userId) => {
   return await User.findById(userId).select("-password");
 };
+
+export const updateUserById = async (userId, updateData) => {
+  return await User.findByIdAndUpdate(
+    userId,
+    updateData,
+    {
+      new: true,
+      runValidators: true,
+    }
+  ).select("-password");
+};
