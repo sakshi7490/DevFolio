@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const User = require("./user.model");
 
 const getUserProfile = async (userId) => {
@@ -67,4 +68,32 @@ const updateUserProfile = async (userId, profileData) => {
 module.exports = {
   getUserProfile,
   updateUserProfile,
+=======
+import { findUserById, updateUserById, } from "./user.repository.js";
+import ApiError from "../../utils/ApiError.js";
+
+export const getUserProfile = async (userId) => {
+  const user = await findUserById(userId);
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  return user;
+};
+
+
+
+// Update Profile
+export const updateUserProfile = async (userId, updateData) => {
+  const user = await findUserById(userId);
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const updatedUser = await updateUserById(userId, updateData);
+
+  return updatedUser;
+>>>>>>> 2ce68f34ee245e8af9c2d846267b7f2c54cebd7c
 };
