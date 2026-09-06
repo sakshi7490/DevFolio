@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 import {
   LayoutDashboard,
   UserRound,
@@ -11,16 +13,19 @@ import {
   X,
 } from "lucide-react";
 
-const Sidebar = ({ isOpen, onClose, onLogout }) => {
+const Sidebar = ({ isOpen, onClose, onLogout, user }) => {
+  const navigate = useNavigate();
+
   const menuItems = [
     {
       label: "Dashboard",
       icon: LayoutDashboard,
-      active: true,
+      path: "/dashboard",
     },
     {
       label: "My Profile",
       icon: UserRound,
+      path: "/profile",
     },
     {
       label: "Projects",
@@ -96,11 +101,17 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
             return (
               <button
                 key={item.label}
+                onClick={() => {
+                  if (item.path) {
+                    navigate(item.path);
+                    onClose();
+                  }
+                }}
                 className={`
                   flex w-full items-center gap-3 rounded-lg px-4 py-3
                   text-sm transition-all
                   ${
-                    item.active
+                    item.path === "/dashboard"
                       ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-purple-500/20"
                       : "text-gray-400 hover:bg-white/5 hover:text-white"
                   }
@@ -117,15 +128,16 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
         <div className="border-t border-white/10 p-4">
           <div className="mb-3 flex items-center gap-3 rounded-lg bg-white/5 p-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-purple-600 font-semibold">
-              S
+              {user?.name?.charAt(0)?.toUpperCase() || "U"}
             </div>
 
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium text-white">
-                User
+                {user?.name || "User"}
               </p>
+
               <p className="truncate text-xs text-gray-500">
-                user@example.com
+                {user?.email || "user@example.com"}
               </p>
             </div>
           </div>
