@@ -53,6 +53,12 @@ const portfolioSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    status: {
+      type: String,
+      enum: ["draft", "published"],
+      default: "draft",
+      required: true,
+    },
 
     featuredImage: {
       type: String,
@@ -61,7 +67,7 @@ const portfolioSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const Portfolio = mongoose.model("Portfolio", portfolioSchema);

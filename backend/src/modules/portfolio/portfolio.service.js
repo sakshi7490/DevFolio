@@ -58,9 +58,45 @@ const deletePortfolio = async (portfolioId, userId) => {
   return portfolio;
 };
 
+const updatePortfolioSettings = async (
+  portfolioId,
+  userId,
+  settings
+) => {
+  const portfolio = await Portfolio.findOne({
+    _id: portfolioId,
+    userId,
+  });
+
+  if (!portfolio) {
+    throw new ApiError(404, "Portfolio not found");
+  }
+
+  if (settings.slug && settings.slug !== portfolio.slug) {
+    const existingPortfolio = await Portfolio.findOne({
+      slug: settings.slug,
+      _id: { $ne: portfolioId },
+    });
+
+    if (existingPortfolio) {
+      throw new ApiError(
+        409,
+        "Portfolio with this slug already exists"
+      );
+    }
+  }
+
+  Object.assign(portfolio, settings);
+
+  await portfolio.save();
+
+  return portfolio;
+};
+
 export default {
   createPortfolio,
   getUserPortfolios,
   getSinglePortfolio,
   deletePortfolio,
+  updatePortfolioSettings,
 };

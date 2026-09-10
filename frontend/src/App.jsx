@@ -9,6 +9,7 @@ import CreatePortfolio from "./features/portfolio/pages/CreatePortfolio";
 import PortfolioDetails from "./features/portfolio/pages/PortfolioDetails";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import PublicRoute from "./routes/PublicRoute";
+import PortfolioSettings from "./features/portfolio/pages/PortfolioSettings";
 
 function App() {
   return (
@@ -33,6 +34,10 @@ function App() {
         <Route
           path="/dashboard/portfolios/:id"
           element={<PortfolioDetails />}
+        />
+        <Route
+          path="/dashboard/portfolios/:id/settings"
+          element={<PortfolioSettings />}
         />
       </Route>
     </Routes>

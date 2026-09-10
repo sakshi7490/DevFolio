@@ -9,7 +9,7 @@ const PortfolioCard = ({ portfolio, onDelete }) => {
 
   const handleDelete = async () => {
     const confirmed = window.confirm(
-      `Are you sure you want to delete "${portfolio.title}"?`
+      `Are you sure you want to delete "${portfolio.title}"?`,
     );
 
     if (!confirmed) return;
@@ -22,8 +22,7 @@ const PortfolioCard = ({ portfolio, onDelete }) => {
       onDelete(portfolio._id);
     } catch (error) {
       window.alert(
-        error.response?.data?.message ||
-          "Failed to delete portfolio"
+        error.response?.data?.message || "Failed to delete portfolio",
       );
     } finally {
       setDeleting(false);
@@ -32,7 +31,6 @@ const PortfolioCard = ({ portfolio, onDelete }) => {
 
   return (
     <div className="group overflow-hidden rounded-xl border border-gray-800 bg-[#0d0e14] transition hover:border-cyan-400/40">
-
       {/* Featured Image */}
       <div className="h-40 overflow-hidden bg-[#08090d]">
         {portfolio.featuredImage ? (
@@ -43,9 +41,7 @@ const PortfolioCard = ({ portfolio, onDelete }) => {
           />
         ) : (
           <div className="flex h-full items-center justify-center">
-            <span className="text-sm text-gray-600">
-              No preview image
-            </span>
+            <span className="text-sm text-gray-600">No preview image</span>
           </div>
         )}
       </div>
@@ -55,6 +51,15 @@ const PortfolioCard = ({ portfolio, onDelete }) => {
         <h2 className="truncate text-lg font-semibold text-white">
           {portfolio.title}
         </h2>
+        <span
+          className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${
+            portfolio.status === "published"
+              ? "bg-green-500/10 text-green-400"
+              : "bg-gray-500/10 text-gray-400"
+          }`}
+        >
+          {portfolio.status === "published" ? "Published" : "Draft"}
+        </span>
 
         <p className="mt-2 line-clamp-2 text-sm text-gray-500">
           {portfolio.description || "No description added."}
@@ -63,16 +68,14 @@ const PortfolioCard = ({ portfolio, onDelete }) => {
         {/* Technologies */}
         {portfolio.technologies?.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-2">
-            {portfolio.technologies
-              .slice(0, 4)
-              .map((technology, index) => (
-                <span
-                  key={`${technology}-${index}`}
-                  className="rounded-md border border-cyan-400/20 bg-cyan-400/5 px-2 py-1 text-xs text-cyan-400"
-                >
-                  {technology}
-                </span>
-              ))}
+            {portfolio.technologies.slice(0, 4).map((technology, index) => (
+              <span
+                key={`${technology}-${index}`}
+                className="rounded-md border border-cyan-400/20 bg-cyan-400/5 px-2 py-1 text-xs text-cyan-400"
+              >
+                {technology}
+              </span>
+            ))}
 
             {portfolio.technologies.length > 4 && (
               <span className="px-1 py-1 text-xs text-gray-500">
@@ -90,14 +93,19 @@ const PortfolioCard = ({ portfolio, onDelete }) => {
 
           <div className="flex items-center gap-3">
             <button
-              onClick={() =>
-                navigate(
-                  `/dashboard/portfolios/${portfolio._id}`
-                )
-              }
+              onClick={() => navigate(`/dashboard/portfolios/${portfolio._id}`)}
               className="text-sm font-medium text-cyan-400 transition hover:text-cyan-300"
             >
               View →
+            </button>
+
+            <button
+              onClick={() =>
+                navigate(`/dashboard/portfolios/${portfolio._id}/settings`)
+              }
+              className="text-sm font-medium text-gray-400 transition hover:text-cyan-400"
+            >
+              Settings
             </button>
 
             <button

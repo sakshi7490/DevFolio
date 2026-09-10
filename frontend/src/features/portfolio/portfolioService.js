@@ -24,9 +24,19 @@ const deletePortfolio = async (id) => {
   return response.data;
 };
 
+const updatePortfolioSettings = async (id, settings) => {
+  const response = await api.patch(
+    `/portfolios/${id}/settings`,
+    settings
+  );
+
+  return response.data;
+};
+
 export default {
   createPortfolio,
   getPortfolios,
   getPortfolio,
   deletePortfolio,
+  updatePortfolioSettings,
 };
