@@ -3,6 +3,9 @@ import { Router } from "express";
 import authRoutes from "../modules/auth/auth.routes.js";
 import userRoutes from "../modules/user/user.routes.js";
 import portfolioRoutes from "../modules/portfolio/portfolio.routes.js";
+import personalRoutes from "../modules/portfolio/personal.routes.js";
+import aboutRoutes from "../modules/portfolio/about.routes.js";
+import socialRoutes from "../modules/portfolio/social.routes.js";
 
 const router = Router();
 
@@ -24,5 +27,7 @@ router.use("/users", userRoutes);
 
 // Portfolio Routes
 router.use("/portfolios", portfolioRoutes);
-
+router.use("/portfolios", personalRoutes);
+router.use("/portfolios", aboutRoutes);
+router.use("/portfolios", socialRoutes);
 export default router;

@@ -101,6 +101,15 @@ const PortfolioCard = ({ portfolio, onDelete }) => {
 
             <button
               onClick={() =>
+                navigate(`/dashboard/portfolios/${portfolio._id}/edit`)
+              }
+              className="text-sm font-medium text-gray-400 transition hover:text-cyan-400"
+            >
+              Edit
+            </button>
+
+            <button
+              onClick={() =>
                 navigate(`/dashboard/portfolios/${portfolio._id}/settings`)
               }
               className="text-sm font-medium text-gray-400 transition hover:text-cyan-400"
