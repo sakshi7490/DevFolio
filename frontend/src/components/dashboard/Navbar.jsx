@@ -3,14 +3,14 @@ import { Menu, Search, Bell } from "lucide-react";
 const Navbar = ({ onMenuClick, user }) => {
   return (
     <header className="flex h-20 items-center justify-between border-b border-white/10 bg-[#0d0f16] px-4 lg:px-8">
-      
       {/* Left */}
       <div className="flex items-center gap-4">
         <button
           onClick={onMenuClick}
-          className="rounded-lg p-2 text-gray-400 transition hover:bg-white/5 hover:text-white lg:hidden"
+          className="rounded-lg p-2 text-gray-400 transition hover:bg-white/5 hover:text-white"
+          aria-label="Open menu"
         >
-          <Menu size={22} />
+          <Menu size={24} />
         </button>
 
         <h1 className="text-lg font-semibold text-white">
@@ -21,12 +21,18 @@ const Navbar = ({ onMenuClick, user }) => {
       {/* Right */}
       <div className="flex items-center gap-3">
         {/* Search */}
-        <button className="hidden rounded-lg p-2 text-gray-400 transition hover:bg-white/5 hover:text-white sm:block">
+        <button
+          className="hidden rounded-lg p-2 text-gray-400 transition hover:bg-white/5 hover:text-white sm:block"
+          aria-label="Search"
+        >
           <Search size={20} />
         </button>
 
         {/* Notification */}
-        <button className="rounded-lg p-2 text-gray-400 transition hover:bg-white/5 hover:text-white">
+        <button
+          className="rounded-lg p-2 text-gray-400 transition hover:bg-white/5 hover:text-white"
+          aria-label="Notifications"
+        >
           <Bell size={20} />
         </button>
 

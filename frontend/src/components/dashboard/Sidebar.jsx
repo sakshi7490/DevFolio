@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import {
   LayoutDashboard,
@@ -15,6 +15,7 @@ import {
 
 const Sidebar = ({ isOpen, onClose, onLogout, user }) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const menuItems = [
     {
@@ -26,6 +27,11 @@ const Sidebar = ({ isOpen, onClose, onLogout, user }) => {
       label: "My Profile",
       icon: UserRound,
       path: "/profile",
+    },
+    {
+      label: "My Portfolios",
+      icon: FolderKanban,
+      path: "/dashboard/portfolios",
     },
     {
       label: "Projects",
@@ -55,20 +61,21 @@ const Sidebar = ({ isOpen, onClose, onLogout, user }) => {
 
   return (
     <>
-      {/* Mobile Overlay */}
+      {/* Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/60 lg:hidden"
+          className="fixed inset-0 z-40 bg-black/60"
           onClick={onClose}
         />
       )}
 
+      {/* Sidebar */}
       <aside
         className={`
           fixed left-0 top-0 z-50 flex h-screen w-64 flex-col
           border-r border-white/10 bg-[#0d0f16]
-          transition-transform duration-300
-          lg:static lg:translate-x-0
+          shadow-2xl
+          transition-transform duration-300 ease-in-out
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
         `}
       >
@@ -84,10 +91,10 @@ const Sidebar = ({ isOpen, onClose, onLogout, user }) => {
             </span>
           </div>
 
-          {/* Close button - mobile */}
+          {/* Close Button */}
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white lg:hidden"
+            className="rounded-lg p-1 text-gray-400 transition hover:bg-white/5 hover:text-white"
           >
             <X size={22} />
           </button>
@@ -98,6 +105,14 @@ const Sidebar = ({ isOpen, onClose, onLogout, user }) => {
           {menuItems.map((item) => {
             const Icon = item.icon;
 
+            const isActive =
+              item.path &&
+              (location.pathname === item.path ||
+                (item.path === "/dashboard/portfolios" &&
+                  location.pathname.startsWith(
+                    "/dashboard/portfolios/"
+                  )));
+
             return (
               <button
                 key={item.label}
@@ -107,13 +122,16 @@ const Sidebar = ({ isOpen, onClose, onLogout, user }) => {
                     onClose();
                   }
                 }}
+                disabled={!item.path}
                 className={`
                   flex w-full items-center gap-3 rounded-lg px-4 py-3
                   text-sm transition-all
                   ${
-                    item.path === "/dashboard"
+                    isActive
                       ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-purple-500/20"
-                      : "text-gray-400 hover:bg-white/5 hover:text-white"
+                      : item.path
+                      ? "text-gray-400 hover:bg-white/5 hover:text-white"
+                      : "cursor-default text-gray-500"
                   }
                 `}
               >
@@ -124,7 +142,7 @@ const Sidebar = ({ isOpen, onClose, onLogout, user }) => {
           })}
         </nav>
 
-        {/* User section */}
+        {/* User Section */}
         <div className="border-t border-white/10 p-4">
           <div className="mb-3 flex items-center gap-3 rounded-lg bg-white/5 p-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-purple-600 font-semibold">
@@ -142,6 +160,7 @@ const Sidebar = ({ isOpen, onClose, onLogout, user }) => {
             </div>
           </div>
 
+          {/* Logout */}
           <button
             onClick={onLogout}
             className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm text-gray-400 transition hover:bg-red-500/10 hover:text-red-400"

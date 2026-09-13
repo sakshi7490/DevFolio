@@ -1,10 +1,11 @@
 import { ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const WelcomeSection = ({ user }) => {
+  const navigate = useNavigate();
+
   return (
     <section className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#1b1d29] to-[#151720] p-6 lg:p-8">
-      
-      {/* Background glow */}
       <div className="absolute -right-20 -top-20 h-48 w-48 rounded-full bg-purple-600/10 blur-3xl" />
 
       <div className="relative max-w-2xl">
@@ -22,12 +23,18 @@ const WelcomeSection = ({ user }) => {
         </p>
 
         <div className="mt-6 flex flex-wrap gap-3">
-          <button className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-cyan-500 to-purple-600 px-5 py-3 text-sm font-medium text-white transition hover:opacity-90">
-            + Create New Project
+          <button
+            onClick={() => navigate("/dashboard/portfolios/create")}
+            className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-cyan-500 to-purple-600 px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
+          >
+            + Create New Portfolio
           </button>
 
-          <button className="flex items-center gap-2 rounded-lg border border-purple-500/60 px-5 py-3 text-sm font-medium text-white transition hover:bg-purple-500/10">
-            View My Portfolio
+          <button
+            onClick={() => navigate("/dashboard/portfolios")}
+            className="flex items-center gap-2 rounded-lg border border-purple-500/60 px-5 py-3 text-sm font-medium text-white transition hover:bg-purple-500/10"
+          >
+            View My Portfolios
             <ArrowRight size={16} />
           </button>
         </div>
