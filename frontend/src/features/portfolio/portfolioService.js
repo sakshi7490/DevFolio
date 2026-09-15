@@ -102,6 +102,131 @@ const uploadProfileImage = async (portfolioId, file) => {
   return response.data;
 };
 
+
+const getSkills = async (portfolioId) => {
+  const response = await api.get(
+    `/portfolios/${portfolioId}/skills`
+  );
+  return response.data;
+};
+
+const createSkill = async (portfolioId, skillData) => {
+  const response = await api.post(
+    `/portfolios/${portfolioId}/skills`,
+    skillData
+  );
+  return response.data;
+};
+
+const updateSkill = async (
+  portfolioId,
+  skillId,
+  skillData
+) => {
+  const response = await api.patch(
+    `/portfolios/${portfolioId}/skills/${skillId}`,
+    skillData
+  );
+  return response.data;
+};
+
+const deleteSkill = async (portfolioId, skillId) => {
+  const response = await api.delete(
+    `/portfolios/${portfolioId}/skills/${skillId}`
+  );
+  return response.data;
+};
+
+
+const getEducation = async (portfolioId) => {
+  const response = await api.get(
+    `/portfolios/${portfolioId}/education`
+  );
+
+  return response.data;
+};
+
+const createEducation = async (
+  portfolioId,
+  educationData
+) => {
+  const response = await api.post(
+    `/portfolios/${portfolioId}/education`,
+    educationData
+  );
+
+  return response.data;
+};
+
+const updateEducation = async (
+  portfolioId,
+  educationId,
+  educationData
+) => {
+  const response = await api.patch(
+    `/portfolios/${portfolioId}/education/${educationId}`,
+    educationData
+  );
+
+  return response.data;
+};
+
+const deleteEducation = async (
+  portfolioId,
+  educationId
+) => {
+  const response = await api.delete(
+    `/portfolios/${portfolioId}/education/${educationId}`
+  );
+
+  return response.data;
+};
+
+
+const getCertifications = async (portfolioId) => {
+  const response = await api.get(
+    `/portfolios/${portfolioId}/certifications`
+  );
+
+  return response.data;
+};
+
+const createCertification = async (
+  portfolioId,
+  certificationData
+) => {
+  const response = await api.post(
+    `/portfolios/${portfolioId}/certifications`,
+    certificationData
+  );
+
+  return response.data;
+};
+
+const updateCertification = async (
+  portfolioId,
+  certificationId,
+  certificationData
+) => {
+  const response = await api.patch(
+    `/portfolios/${portfolioId}/certifications/${certificationId}`,
+    certificationData
+  );
+
+  return response.data;
+};
+
+const deleteCertification = async (
+  portfolioId,
+  certificationId
+) => {
+  const response = await api.delete(
+    `/portfolios/${portfolioId}/certifications/${certificationId}`
+  );
+
+  return response.data;
+};
+
 export default {
   createPortfolio,
   getPortfolios,
@@ -116,4 +241,16 @@ export default {
   updatePersonal,
   deletePortfolio,
   updatePortfolioSettings,
+  getSkills,
+  createSkill,
+  updateSkill,
+  deleteSkill,
+  getEducation,
+  createEducation,
+  updateEducation,
+  deleteEducation,
+  getCertifications,
+  createCertification,
+  updateCertification,
+  deleteCertification
 };

@@ -6,6 +6,9 @@ import portfolioRoutes from "../modules/portfolio/portfolio.routes.js";
 import personalRoutes from "../modules/portfolio/personal.routes.js";
 import aboutRoutes from "../modules/portfolio/about.routes.js";
 import socialRoutes from "../modules/portfolio/social.routes.js";
+import skillRoutes from "../modules/portfolio/skill.routes.js";
+import educationRoutes from "../modules/portfolio/education.routes.js";
+import certificationRoutes from "../modules/portfolio/certification.routes.js";
 
 const router = Router();
 
@@ -30,4 +33,9 @@ router.use("/portfolios", portfolioRoutes);
 router.use("/portfolios", personalRoutes);
 router.use("/portfolios", aboutRoutes);
 router.use("/portfolios", socialRoutes);
+router.use("/portfolios", skillRoutes);
+router.use("/portfolios",educationRoutes);
+router.use("/portfolios", certificationRoutes);
+
+
 export default router;
