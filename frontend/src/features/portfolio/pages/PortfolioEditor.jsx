@@ -6,7 +6,7 @@ import SocialLinksForm from "../components/SocialLinksForm";
 import SkillsSection from "../components/SkillsSection";
 import EducationSection from "../components/EducationSection";
 import CertificationSection from "../components/CertificationSection";
-
+import ProjectsSection from "../components/ProjectsSection";
 const PortfolioEditor = () => {
   const { id } = useParams();
 
@@ -33,6 +33,8 @@ const PortfolioEditor = () => {
       <EducationSection portfolioId={id} />
 
       <CertificationSection portfolioId={id} />
+
+      <ProjectsSection portfolioId={id} />
     </div>
   );
 };

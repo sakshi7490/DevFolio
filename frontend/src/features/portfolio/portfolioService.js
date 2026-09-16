@@ -227,6 +227,72 @@ const deleteCertification = async (
   return response.data;
 };
 
+const getProjects = async (portfolioId) => {
+  const response = await api.get(
+    `/portfolios/${portfolioId}/projects`
+  );
+
+  return response.data;
+};
+
+const createProject = async (
+  portfolioId,
+  projectData
+) => {
+  const response = await api.post(
+    `/portfolios/${portfolioId}/projects`,
+    projectData
+  );
+
+  return response.data;
+};
+
+const updateProject = async (
+  portfolioId,
+  projectId,
+  projectData
+) => {
+  const response = await api.patch(
+    `/portfolios/${portfolioId}/projects/${projectId}`,
+    projectData
+  );
+
+  return response.data;
+};
+
+const deleteProject = async (
+  portfolioId,
+  projectId
+) => {
+  const response = await api.delete(
+    `/portfolios/${portfolioId}/projects/${projectId}`
+  );
+
+  return response.data;
+};
+
+const uploadProjectImage = async (
+  portfolioId,
+  projectId,
+  file
+) => {
+  const formData = new FormData();
+
+  formData.append("projectImage", file);
+
+  const response = await api.post(
+    `/portfolios/${portfolioId}/projects/${projectId}/image`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+
+  return response.data;
+};
+
 export default {
   createPortfolio,
   getPortfolios,
@@ -252,5 +318,11 @@ export default {
   getCertifications,
   createCertification,
   updateCertification,
-  deleteCertification
+  deleteCertification,
+  getProjects,
+  createProject,
+  updateProject,
+  deleteProject,
+  uploadProjectImage
+
 };
