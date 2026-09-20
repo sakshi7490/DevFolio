@@ -1,43 +1,25 @@
-import { Menu, Search, Bell } from "lucide-react";
+import { Menu } from "lucide-react";
 
-const Navbar = ({ onMenuClick, user }) => {
+const Navbar = ({ onMenuClick, user, title = "Dashboard" }) => {
   return (
-    <header className="flex h-20 items-center justify-between border-b border-white/10 bg-[#0d0f16] px-4 lg:px-8">
-      {/* Left */}
-      <div className="flex items-center gap-4">
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-stone-200/80 bg-white/85 px-4 backdrop-blur-md lg:px-8">
+      <div className="flex items-center gap-3">
         <button
           onClick={onMenuClick}
-          className="rounded-lg p-2 text-gray-400 transition hover:bg-white/5 hover:text-white"
+          className="rounded-lg p-2 text-muted transition hover:bg-canvas hover:text-ink lg:hidden"
           aria-label="Open menu"
         >
-          <Menu size={24} />
+          <Menu size={22} />
         </button>
-
-        <h1 className="text-lg font-semibold text-white">
-          Dashboard
-        </h1>
+        <h1 className="text-base font-semibold text-ink">{title}</h1>
       </div>
 
-      {/* Right */}
       <div className="flex items-center gap-3">
-        {/* Search */}
-        <button
-          className="hidden rounded-lg p-2 text-gray-400 transition hover:bg-white/5 hover:text-white sm:block"
-          aria-label="Search"
-        >
-          <Search size={20} />
-        </button>
-
-        {/* Notification */}
-        <button
-          className="rounded-lg p-2 text-gray-400 transition hover:bg-white/5 hover:text-white"
-          aria-label="Notifications"
-        >
-          <Bell size={20} />
-        </button>
-
-        {/* Profile */}
-        <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-cyan-400 to-purple-600 font-semibold text-white">
+        <div className="hidden text-right sm:block">
+          <p className="text-sm font-medium text-ink">{user?.name || "User"}</p>
+          <p className="text-xs text-muted">{user?.email}</p>
+        </div>
+        <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-navy text-sm font-semibold text-white">
           {user?.profileImage ? (
             <img
               src={user.profileImage}

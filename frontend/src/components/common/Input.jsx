@@ -1,3 +1,5 @@
+import { fieldClass, fieldErrorClass, labelClass } from "../../styles/ui";
+
 const Input = ({
   label,
   type = "text",
@@ -7,14 +9,12 @@ const Input = ({
   placeholder,
   error,
   required = false,
+  disabled = false,
 }) => {
   return (
     <div className="w-full">
       {label && (
-        <label
-          htmlFor={name}
-          className="mb-2 block text-sm font-medium text-gray-300"
-        >
+        <label htmlFor={name} className={labelClass}>
           {label}
         </label>
       )}
@@ -27,28 +27,11 @@ const Input = ({
         onChange={onChange}
         placeholder={placeholder}
         required={required}
-        className={`
-          w-full rounded-lg
-          border
-          bg-[#0d0e14]
-          px-4 py-3
-          text-sm text-white
-          placeholder:text-gray-600
-          outline-none
-          transition
-          ${
-            error
-              ? "border-red-500 focus:ring-2 focus:ring-red-500/20"
-              : "border-gray-700 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/10"
-          }
-        `}
+        disabled={disabled}
+        className={error ? fieldErrorClass : fieldClass}
       />
 
-      {error && (
-        <p className="mt-1.5 text-sm text-red-400">
-          {error}
-        </p>
-      )}
+      {error && <p className="mt-1.5 text-sm text-red-600">{error}</p>}
     </div>
   );
 };

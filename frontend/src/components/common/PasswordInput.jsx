@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { fieldClass, fieldErrorClass, labelClass } from "../../styles/ui";
 
 const PasswordInput = ({
   label,
@@ -15,10 +16,7 @@ const PasswordInput = ({
   return (
     <div className="w-full">
       {label && (
-        <label
-          htmlFor={name}
-          className="mb-2 block text-sm font-medium text-gray-300"
-        >
+        <label htmlFor={name} className={labelClass}>
           {label}
         </label>
       )}
@@ -32,47 +30,20 @@ const PasswordInput = ({
           onChange={onChange}
           placeholder={placeholder}
           required={required}
-          className={`
-            w-full rounded-lg
-            border
-            bg-[#0d0e14]
-            px-4 py-3 pr-12
-            text-sm text-white
-            placeholder:text-gray-600
-            outline-none
-            transition
-            ${
-              error
-                ? "border-red-500 focus:ring-2 focus:ring-red-500/20"
-                : "border-gray-700 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/10"
-            }
-          `}
+          className={`${error ? fieldErrorClass : fieldClass} pr-12`}
         />
 
         <button
           type="button"
           onClick={() => setShowPassword((prev) => !prev)}
-          className="
-            absolute right-3 top-1/2
-            -translate-y-1/2
-            text-gray-500
-            transition
-            hover:text-cyan-400
-          "
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 transition hover:text-ink"
+          aria-label={showPassword ? "Hide password" : "Show password"}
         >
-          {showPassword ? (
-            <EyeOff size={19} />
-          ) : (
-            <Eye size={19} />
-          )}
+          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
         </button>
       </div>
 
-      {error && (
-        <p className="mt-1.5 text-sm text-red-400">
-          {error}
-        </p>
-      )}
+      {error && <p className="mt-1.5 text-sm text-red-600">{error}</p>}
     </div>
   );
 };

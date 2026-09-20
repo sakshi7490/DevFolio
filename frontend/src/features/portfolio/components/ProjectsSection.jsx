@@ -24,6 +24,7 @@ const ProjectsSection = ({ portfolioId }) => {
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     loadProjects();
@@ -32,6 +33,8 @@ const ProjectsSection = ({ portfolioId }) => {
   const loadProjects = async () => {
     try {
       setLoading(true);
+      setError("");
+
       const response =
         await portfolioService.getProjects(portfolioId);
 
@@ -222,6 +225,8 @@ const ProjectsSection = ({ portfolioId }) => {
     if (!window.confirm("Delete this project?")) return;
 
     try {
+      setError("");
+
       await portfolioService.deleteProject(
         portfolioId,
         projectId
@@ -240,322 +245,368 @@ const ProjectsSection = ({ portfolioId }) => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-6">
-        <p className="text-sm text-gray-500">
-          Loading projects...
-        </p>
-      </div>
+  const formatDate = (date) => {
+    if (!date) return "";
+
+    return new Date(date).toLocaleDateString(
+      "en-US",
+      {
+        month: "short",
+        year: "numeric",
+      }
     );
-  }
+  };
+
+  const inputClass =
+    "w-full rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-sm text-ink placeholder-stone-400 outline-none transition focus:border-accent";
 
   return (
-    <section className="rounded-xl border border-gray-800 bg-gray-900/50 p-6">
+    <section className="w-full rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-6">
+
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-white">
+          <h2 className="text-lg font-semibold text-ink">
             Projects
           </h2>
 
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-muted">
             Showcase your projects and technical work.
           </p>
         </div>
 
-        {!isAdding && (
-          <button
-            type="button"
-            onClick={() => setIsAdding(true)}
-            className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-medium text-black hover:bg-cyan-400"
-          >
-            + Add Project
-          </button>
-        )}
+        <div className="flex items-center gap-3">
+  {!isAdding && (
+    <button
+      type="button"
+      onClick={() => setIsAdding(true)}
+      className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700"
+    >
+      + Add Project
+    </button>
+  )}
+
+  <button
+    type="button"
+    onClick={() => setVisible((prev) => !prev)}
+    className={`relative h-6 w-11 shrink-0 rounded-full transition ${
+      visible ? "bg-accent" : "bg-stone-300"
+    }`}
+    aria-label="Toggle projects visibility"
+  >
+    <span
+      className={`absolute top-1 h-4 w-4 rounded-full bg-white transition-all ${
+        visible ? "left-6" : "left-1"
+      }`}
+    />
+  </button>
+</div>
       </div>
 
-      {message && (
-        <p className="mt-4 text-sm text-green-400">
-          {message}
-        </p>
-      )}
+      {visible && (
+        <>
+          {/* Messages */}
+          {error && (
+            <div className="mt-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {error}
+            </div>
+          )}
 
-      {error && (
-        <p className="mt-4 text-sm text-red-400">
-          {error}
-        </p>
-      )}
+          {message && (
+            <div className="mt-5 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+              {message}
+            </div>
+          )}
 
-      {isAdding && (
-        <form
-          onSubmit={handleSubmit}
-          className="mt-6 space-y-5 border-t border-gray-800 pt-6"
-        >
-          <div>
-            <label className="mb-2 block text-sm text-gray-300">
-              Project Title *
-            </label>
+          {/* Projects List */}
+          <div className="mt-6">
+            {loading ? (
+              <div className="space-y-3">
+                <div className="h-28 animate-pulse rounded-xl bg-canvas" />
+                <div className="h-28 animate-pulse rounded-xl bg-canvas" />
+              </div>
+            ) : projects.length === 0 && !isAdding ? (
+              <div className="rounded-xl border border-dashed border-stone-300 px-5 py-8 text-center">
+                <p className="text-sm text-stone-600">
+                  No projects added yet.
+                </p>
 
-            <input
-              type="text"
-              name="title"
-              value={form.title}
-              onChange={handleChange}
-              placeholder="e.g. DevFolio"
-              className="w-full rounded-lg border border-gray-700 bg-gray-950 px-4 py-2.5 text-sm text-white outline-none focus:border-cyan-500"
-            />
-          </div>
+                <p className="mt-1 text-xs text-muted">
+                  Add your projects and technical work below.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {projects.map((project) => (
+                  <div key={project._id}>
 
-          <div>
-            <label className="mb-2 block text-sm text-gray-300">
-              Description
-            </label>
+                    {/* Project Card */}
+                    {!editingId ||
+                    editingId !== project._id ? (
+                      <div className="group rounded-xl border border-stone-200 bg-canvas p-4 transition hover:border-accent/30">
 
-            <textarea
-              name="description"
-              value={form.description}
-              onChange={handleChange}
-              rows={4}
-              placeholder="Describe your project..."
-              className="w-full rounded-lg border border-gray-700 bg-gray-950 px-4 py-2.5 text-sm text-white outline-none focus:border-cyan-500"
-            />
-          </div>
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 
-          <div>
-            <label className="mb-2 block text-sm text-gray-300">
-              Technologies
-            </label>
+                          <div className="flex min-w-0 gap-4">
 
-            <input
-              type="text"
-              value={technologyInput}
-              onChange={(e) =>
-                setTechnologyInput(e.target.value)
-              }
-              onKeyDown={addTechnology}
-              placeholder="Type technology and press Enter"
-              className="w-full rounded-lg border border-gray-700 bg-gray-950 px-4 py-2.5 text-sm text-white outline-none focus:border-cyan-500"
-            />
+                            {project.image && (
+                              <img
+                                src={project.image}
+                                alt={project.title}
+                                className="h-20 w-20 shrink-0 rounded-lg object-cover"
+                              />
+                            )}
 
-            {form.technologies.length > 0 && (
-              <div className="mt-3 flex flex-wrap gap-2">
-                {form.technologies.map((technology) => (
-                  <span
-                    key={technology}
-                    className="flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-xs text-cyan-300"
-                  >
-                    {technology}
+                            <div className="min-w-0">
+                              <h3 className="text-base font-semibold text-ink">
+                                {project.title}
+                              </h3>
 
-                    <button
-                      type="button"
-                      onClick={() =>
-                        removeTechnology(technology)
-                      }
-                      className="text-cyan-400 hover:text-white"
-                    >
-                      ×
-                    </button>
-                  </span>
+                              {project.description && (
+                                <p className="mt-2 text-sm leading-6 text-muted">
+                                  {project.description}
+                                </p>
+                              )}
+
+                              {project.technologies?.length > 0 && (
+                                <div className="mt-3 flex flex-wrap gap-2">
+                                  {project.technologies.map(
+                                    (technology) => (
+                                      <span
+                                        key={technology}
+                                        className="rounded-full border border-accent/20 bg-emerald-50 px-2.5 py-1 text-xs text-accent"
+                                      >
+                                        {technology}
+                                      </span>
+                                    )
+                                  )}
+                                </div>
+                              )}
+
+                              {(project.startDate ||
+                                project.endDate) && (
+                                <p className="mt-3 text-xs text-muted">
+                                  {formatDate(
+                                    project.startDate
+                                  )}
+                                  {" — "}
+                                  {project.endDate
+                                    ? formatDate(
+                                        project.endDate
+                                      )
+                                    : "Present"}
+                                </p>
+                              )}
+
+                              {(project.projectUrl ||
+                                project.githubUrl) && (
+                                <div className="mt-3 flex flex-wrap gap-3">
+                                  {project.projectUrl && (
+                                    <a
+                                      href={project.projectUrl}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="text-xs font-medium text-accent hover:text-emerald-700"
+                                    >
+                                      Project ↗
+                                    </a>
+                                  )}
+
+                                  {project.githubUrl && (
+                                    <a
+                                      href={project.githubUrl}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="text-xs font-medium text-accent hover:text-emerald-700"
+                                    >
+                                      GitHub ↗
+                                    </a>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex shrink-0 gap-3">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleEdit(project)
+                              }
+                              className="text-xs text-muted transition hover:text-accent"
+                            >
+                              Edit
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleDelete(project._id)
+                              }
+                              className="text-xs text-muted transition hover:text-red-600"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
                 ))}
               </div>
             )}
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <label className="mb-2 block text-sm text-gray-300">
-                Project URL
-              </label>
+          {/* Add / Edit Project */}
+          {isAdding && (
+            <div className="mt-6 border-t border-stone-100 pt-5">
+              <p className="mb-4 text-sm font-medium text-stone-700">
+                {editingId
+                  ? "Edit project"
+                  : "Add project"}
+              </p>
 
-              <input
-                type="url"
-                name="projectUrl"
-                value={form.projectUrl}
-                onChange={handleChange}
-                placeholder="https://yourproject.com"
-                className="w-full rounded-lg border border-gray-700 bg-gray-950 px-4 py-2.5 text-sm text-white outline-none focus:border-cyan-500"
-              />
-            </div>
+              <form onSubmit={handleSubmit}>
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
 
-            <div>
-              <label className="mb-2 block text-sm text-gray-300">
-                GitHub URL
-              </label>
-
-              <input
-                type="url"
-                name="githubUrl"
-                value={form.githubUrl}
-                onChange={handleChange}
-                placeholder="https://github.com/..."
-                className="w-full rounded-lg border border-gray-700 bg-gray-950 px-4 py-2.5 text-sm text-white outline-none focus:border-cyan-500"
-              />
-            </div>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <label className="mb-2 block text-sm text-gray-300">
-                Start Date
-              </label>
-
-              <input
-                type="date"
-                name="startDate"
-                value={form.startDate}
-                onChange={handleChange}
-                className="w-full rounded-lg border border-gray-700 bg-gray-950 px-4 py-2.5 text-sm text-white outline-none focus:border-cyan-500"
-              />
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm text-gray-300">
-                End Date
-              </label>
-
-              <input
-                type="date"
-                name="endDate"
-                value={form.endDate}
-                onChange={handleChange}
-                className="w-full rounded-lg border border-gray-700 bg-gray-950 px-4 py-2.5 text-sm text-white outline-none focus:border-cyan-500"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm text-gray-300">
-              Project Image
-            </label>
-
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="block w-full text-sm text-gray-400"
-            />
-
-            {imagePreview && (
-              <img
-                src={imagePreview}
-                alt="Project preview"
-                className="mt-4 h-40 w-full rounded-lg object-cover"
-              />
-            )}
-          </div>
-
-          <div className="flex gap-3">
-            <button
-              type="submit"
-              className="rounded-lg bg-cyan-500 px-5 py-2.5 text-sm font-medium text-black hover:bg-cyan-400"
-            >
-              {editingId ? "Update Project" : "Add Project"}
-            </button>
-
-            <button
-              type="button"
-              onClick={resetForm}
-              className="rounded-lg border border-gray-700 px-5 py-2.5 text-sm text-gray-300 hover:bg-gray-800"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
-      )}
-
-      <div className="mt-6 space-y-4">
-        {projects.length === 0 && !isAdding ? (
-          <div className="rounded-lg border border-dashed border-gray-700 p-8 text-center">
-            <p className="text-sm text-gray-500">
-              No projects added yet.
-            </p>
-          </div>
-        ) : (
-          projects.map((project) => (
-            <div
-              key={project._id}
-              className="rounded-xl border border-gray-800 bg-gray-950 p-5"
-            >
-              <div className="flex gap-4">
-                {project.image && (
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    className="h-24 w-24 rounded-lg object-cover"
+                  <input
+                    type="text"
+                    name="title"
+                    value={form.title}
+                    onChange={handleChange}
+                    placeholder="Project title *"
+                    className={inputClass}
                   />
-                )}
 
-                <div className="min-w-0 flex-1">
-                  <h3 className="font-medium text-white">
-                    {project.title}
-                  </h3>
+                  <input
+                    type="text"
+                    value={technologyInput}
+                    onChange={(e) =>
+                      setTechnologyInput(e.target.value)
+                    }
+                    onKeyDown={addTechnology}
+                    placeholder="Technology + Enter"
+                    className={inputClass}
+                  />
 
-                  {project.description && (
-                    <p className="mt-1 text-sm text-gray-400">
-                      {project.description}
-                    </p>
-                  )}
+                  <div className="md:col-span-2">
+                    {form.technologies.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {form.technologies.map(
+                          (technology) => (
+                            <span
+                              key={technology}
+                              className="flex items-center gap-2 rounded-full border border-accent/20 bg-emerald-50 px-3 py-1 text-xs text-accent"
+                            >
+                              {technology}
 
-                  {project.technologies?.length > 0 && (
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {project.technologies.map((technology) => (
-                        <span
-                          key={technology}
-                          className="rounded-full bg-gray-800 px-2.5 py-1 text-xs text-gray-300"
-                        >
-                          {technology}
-                        </span>
-                      ))}
-                    </div>
-                  )}
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  removeTechnology(
+                                    technology
+                                  )
+                                }
+                                className="text-accent hover:text-red-600"
+                              >
+                                ×
+                              </button>
+                            </span>
+                          )
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  <input
+                    type="url"
+                    name="projectUrl"
+                    value={form.projectUrl}
+                    onChange={handleChange}
+                    placeholder="Project URL"
+                    className={inputClass}
+                  />
+
+                  <input
+                    type="url"
+                    name="githubUrl"
+                    value={form.githubUrl}
+                    onChange={handleChange}
+                    placeholder="GitHub URL"
+                    className={inputClass}
+                  />
+
+                  <input
+                    type="date"
+                    name="startDate"
+                    value={form.startDate}
+                    onChange={handleChange}
+                    className={inputClass}
+                  />
+
+                  <input
+                    type="date"
+                    name="endDate"
+                    value={form.endDate}
+                    onChange={handleChange}
+                    className={inputClass}
+                  />
+
+                  <textarea
+                    name="description"
+                    value={form.description}
+                    onChange={handleChange}
+                    placeholder="Brief description"
+                    rows={3}
+                    className={`${inputClass} resize-none md:col-span-2`}
+                  />
+
+                  {/* Project Image */}
+                  <div className="md:col-span-2">
+                    <label className="mb-2 block text-sm font-medium text-stone-700">
+                      Project image
+                    </label>
+
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="block w-full rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-sm text-stone-500"
+                    />
+
+                    {imagePreview && (
+                      <img
+                        src={imagePreview}
+                        alt="Project preview"
+                        className="mt-4 h-40 w-full rounded-xl object-cover"
+                      />
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              <div className="mt-4 flex flex-wrap gap-3 border-t border-gray-800 pt-4">
-                {project.projectUrl && (
-                  <a
-                    href={project.projectUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-sm text-cyan-400 hover:text-cyan-300"
+                <div className="mt-4 flex gap-2">
+                  <button
+                    type="submit"
+                    className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700"
                   >
-                    Project ↗
-                  </a>
-                )}
+                    {editingId
+                      ? "Update Project"
+                      : "Add Project"}
+                  </button>
 
-                {project.githubUrl && (
-                  <a
-                    href={project.githubUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-sm text-cyan-400 hover:text-cyan-300"
+                  <button
+                    type="button"
+                    onClick={resetForm}
+                    className="rounded-lg border border-stone-200 px-5 py-2.5 text-sm text-stone-600 transition hover:text-ink"
                   >
-                    GitHub ↗
-                  </a>
-                )}
-
-                <button
-                  type="button"
-                  onClick={() => handleEdit(project)}
-                  className="text-sm text-gray-400 hover:text-white"
-                >
-                  Edit
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    handleDelete(project._id)
-                  }
-                  className="text-sm text-red-400 hover:text-red-300"
-                >
-                  Delete
-                </button>
-              </div>
+                    Cancel
+                  </button>
+                </div>
+              </form>
             </div>
-          ))
-        )}
-      </div>
+          )}
+        </>
+      )}
     </section>
   );
 };

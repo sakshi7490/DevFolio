@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import Input from "../../../components/common/Input";
 import Button from "../../../components/common/Button";
+import Alert from "../../../components/common/Alert";
 import portfolioService from "../portfolioService";
+import { cardClass } from "../../../styles/ui";
 
 const SocialLinksForm = ({ portfolioId }) => {
   const [formData, setFormData] = useState({
@@ -11,7 +13,6 @@ const SocialLinksForm = ({ portfolioId }) => {
     instagram: "",
     website: "",
   });
-
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
@@ -21,10 +22,7 @@ const SocialLinksForm = ({ portfolioId }) => {
     const fetchSocialLinks = async () => {
       try {
         setLoading(true);
-
-        const response =
-          await portfolioService.getSocial(portfolioId);
-
+        const response = await portfolioService.getSocial(portfolioId);
         if (response.data) {
           setFormData({
             github: response.data.github || "",
@@ -34,12 +32,9 @@ const SocialLinksForm = ({ portfolioId }) => {
             website: response.data.website || "",
           });
         }
-      } catch (error) {
-        if (error.response?.status !== 404) {
-          setError(
-            error.response?.data?.message ||
-              "Failed to load social links"
-          );
+      } catch (err) {
+        if (err.response?.status !== 404) {
+          setError(err.response?.data?.message || "Failed to load social links");
         }
       } finally {
         setLoading(false);
@@ -51,12 +46,10 @@ const SocialLinksForm = ({ portfolioId }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-
     setMessage("");
     setError("");
   };
@@ -68,18 +61,10 @@ const SocialLinksForm = ({ portfolioId }) => {
       setSaving(true);
       setMessage("");
       setError("");
-
-      await portfolioService.updateSocial(
-        portfolioId,
-        formData
-      );
-
+      await portfolioService.updateSocial(portfolioId, formData);
       setMessage("Social links saved successfully.");
-    } catch (error) {
-      setError(
-        error.response?.data?.message ||
-          "Failed to save social links"
-      );
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to save social links");
     } finally {
       setSaving(false);
     }
@@ -87,35 +72,28 @@ const SocialLinksForm = ({ portfolioId }) => {
 
   if (loading) {
     return (
-      <div className="h-80 animate-pulse rounded-xl border border-gray-800 bg-[#0d0e14]" />
+      <div className="h-80 animate-pulse rounded-2xl border border-stone-200 bg-white" />
     );
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="rounded-xl border border-gray-800 bg-[#0d0e14] p-6 md:p-8"
-    >
+    <form onSubmit={handleSubmit} className={cardClass}>
       <div className="mb-6">
-        <h2 className="text-lg font-semibold text-white">
-          Social Links
-        </h2>
-
-        <p className="mt-1 text-sm text-gray-500">
+        <h2 className="text-lg font-semibold text-ink">Social links</h2>
+        <p className="mt-1 text-sm text-muted">
           Add links to your social profiles and website.
         </p>
       </div>
 
       {error && (
-        <div className="mb-5 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+        <Alert type="error" className="mb-5">
           {error}
-        </div>
+        </Alert>
       )}
-
       {message && (
-        <div className="mb-5 rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-400">
+        <Alert type="success" className="mb-5">
           {message}
-        </div>
+        </Alert>
       )}
 
       <div className="space-y-5">
@@ -127,7 +105,6 @@ const SocialLinksForm = ({ portfolioId }) => {
           onChange={handleChange}
           placeholder="https://github.com/username"
         />
-
         <Input
           label="LinkedIn"
           name="linkedin"
@@ -136,7 +113,6 @@ const SocialLinksForm = ({ portfolioId }) => {
           onChange={handleChange}
           placeholder="https://linkedin.com/in/username"
         />
-
         <Input
           label="Twitter / X"
           name="twitter"
@@ -145,7 +121,6 @@ const SocialLinksForm = ({ portfolioId }) => {
           onChange={handleChange}
           placeholder="https://x.com/username"
         />
-
         <Input
           label="Instagram"
           name="instagram"
@@ -154,7 +129,6 @@ const SocialLinksForm = ({ portfolioId }) => {
           onChange={handleChange}
           placeholder="https://instagram.com/username"
         />
-
         <Input
           label="Website"
           name="website"
@@ -163,13 +137,8 @@ const SocialLinksForm = ({ portfolioId }) => {
           onChange={handleChange}
           placeholder="https://yourwebsite.com"
         />
-
-        <Button
-          type="submit"
-          loading={saving}
-          loadingText="Saving..."
-        >
-          Save Social Links
+        <Button type="submit" loading={saving} loadingText="Saving...">
+          Save social links
         </Button>
       </div>
     </form>

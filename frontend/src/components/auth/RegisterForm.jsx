@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { ArrowRight } from "lucide-react";
 
 import useAuth from "../../hooks/useAuth";
-
 import Input from "../common/Input";
 import PasswordInput from "../common/PasswordInput";
 import Button from "../common/Button";
@@ -73,87 +73,78 @@ const RegisterForm = () => {
 
     try {
       setLoading(true);
-
       const { confirmPassword, ...userData } = formData;
-
       await register(userData);
-
       toast.success("Account created successfully!");
-
       navigate("/dashboard");
     } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Registration failed"
-      );
+      toast.error(error.response?.data?.message || "Registration failed");
     } finally {
       setLoading(false);
     }
   };
 
- return (
-  <form onSubmit={handleSubmit} className="space-y-5">
+  return (
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <Input
+        label="Full name"
+        name="name"
+        placeholder="Alex Morgan"
+        value={formData.name}
+        onChange={handleChange}
+        error={errors.name}
+        required
+      />
 
-    <Input
-      label="Full Name"
-      name="name"
-      placeholder="Enter your full name"
-      value={formData.name}
-      onChange={handleChange}
-      error={errors.name}
-      required
-    />
+      <Input
+        label="Email"
+        type="email"
+        name="email"
+        placeholder="you@domain.com"
+        value={formData.email}
+        onChange={handleChange}
+        error={errors.email}
+        required
+      />
 
-    <Input
-      label="Email"
-      type="email"
-      name="email"
-      placeholder="Enter your email"
-      value={formData.email}
-      onChange={handleChange}
-      error={errors.email}
-      required
-    />
+      <PasswordInput
+        label="Password"
+        name="password"
+        placeholder="At least 8 characters"
+        value={formData.password}
+        onChange={handleChange}
+        error={errors.password}
+        required
+      />
 
-    <PasswordInput
-      label="Password"
-      name="password"
-      placeholder="Create a password"
-      value={formData.password}
-      onChange={handleChange}
-      error={errors.password}
-      required
-    />
+      <PasswordInput
+        label="Confirm password"
+        name="confirmPassword"
+        placeholder="Repeat your password"
+        value={formData.confirmPassword}
+        onChange={handleChange}
+        error={errors.confirmPassword}
+        required
+      />
 
-    <PasswordInput
-      label="Confirm Password"
-      name="confirmPassword"
-      placeholder="Confirm your password"
-      value={formData.confirmPassword}
-      onChange={handleChange}
-      error={errors.confirmPassword}
-      required
-    />
-
-    <Button
-      type="submit"
-      loading={loading}
-      loadingText="Creating Account..."
-    >
-      Create Account
-    </Button>
-
-    <p className="text-center text-sm text-gray-600">
-      Already have an account?{" "}
-      <Link
-        to="/login"
-        className="font-semibold text-blue-600 hover:underline"
+      <Button
+        type="submit"
+        loading={loading}
+        loadingText="Creating workspace..."
+        className="w-full"
       >
-        Login
-      </Link>
-    </p>
+        Create workspace
+        <ArrowRight size={16} />
+      </Button>
 
-  </form>
-);
+      <p className="text-center text-sm text-muted">
+        Already have an account?{" "}
+        <Link to="/login" className="font-semibold text-accent hover:text-emerald-800">
+          Sign in
+        </Link>
+      </p>
+    </form>
+  );
 };
 
 export default RegisterForm;
