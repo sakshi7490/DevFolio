@@ -271,6 +271,46 @@ const deleteProject = async (
   return response.data;
 };
 
+
+const getExperiences = async (portfolioId) => {
+  const response = await api.get(
+    `/portfolios/${portfolioId}/experiences`
+  );
+
+  return response.data;
+};
+
+const createExperience = async (portfolioId, experienceData) => {
+  const response = await api.post(
+    `/portfolios/${portfolioId}/experiences`,
+    experienceData
+  );
+
+  return response.data;
+};
+
+const updateExperience = async (
+  portfolioId,
+  experienceId,
+  experienceData
+) => {
+  const response = await api.patch(
+    `/portfolios/${portfolioId}/experiences/${experienceId}`,
+    experienceData
+  );
+
+  return response.data;
+};
+
+const deleteExperience = async (portfolioId, experienceId) => {
+  const response = await api.delete(
+    `/portfolios/${portfolioId}/experiences/${experienceId}`
+  );
+
+  return response.data;
+};
+
+
 const uploadProjectImage = async (
   portfolioId,
   projectId,
@@ -323,6 +363,10 @@ export default {
   createProject,
   updateProject,
   deleteProject,
+  getExperiences,
+  createExperience,
+  updateExperience,
+  deleteExperience,
   uploadProjectImage
 
 };

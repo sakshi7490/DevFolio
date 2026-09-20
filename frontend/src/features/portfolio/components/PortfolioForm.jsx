@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Input from "../../../components/common/Input";
 import Button from "../../../components/common/Button";
+import { fieldClass, fieldErrorClass, labelClass } from "../../../styles/ui";
 
 const PortfolioForm = ({ onSubmit, onCancel, loading = false }) => {
   const [formData, setFormData] = useState({
@@ -17,12 +18,10 @@ const PortfolioForm = ({ onSubmit, onCancel, loading = false }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-
     setErrors((prev) => ({
       ...prev,
       [name]: "",
@@ -31,30 +30,22 @@ const PortfolioForm = ({ onSubmit, onCancel, loading = false }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     const newErrors = {};
 
-    // Title validation
     if (!formData.title.trim()) {
       newErrors.title = "Portfolio title is required";
     } else if (formData.title.trim().length < 3) {
       newErrors.title = "Title must be at least 3 characters";
     }
 
-    // Slug validation
     if (!formData.slug.trim()) {
       newErrors.slug = "Portfolio slug is required";
-    } else if (
-      !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(formData.slug.trim())
-    ) {
-      newErrors.slug =
-        "Use lowercase letters, numbers, and hyphens only";
+    } else if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(formData.slug.trim())) {
+      newErrors.slug = "Use lowercase letters, numbers, and hyphens only";
     }
 
-    // Description validation
     if (formData.description.length > 1000) {
-      newErrors.description =
-        "Description cannot exceed 1000 characters";
+      newErrors.description = "Description cannot exceed 1000 characters";
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -66,12 +57,10 @@ const PortfolioForm = ({ onSubmit, onCancel, loading = false }) => {
       title: formData.title.trim(),
       slug: formData.slug.trim().toLowerCase(),
       description: formData.description.trim(),
-
       technologies: formData.technologies
         .split(",")
         .map((tech) => tech.trim())
         .filter(Boolean),
-
       liveUrl: formData.liveUrl.trim(),
       githubUrl: formData.githubUrl.trim(),
       featuredImage: formData.featuredImage.trim(),
@@ -82,12 +71,9 @@ const PortfolioForm = ({ onSubmit, onCancel, loading = false }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-
-      {/* Portfolio Title */}
       <Input
-        label="Portfolio Title"
+        label="Portfolio title"
         name="title"
-        type="text"
         placeholder="My Developer Portfolio"
         value={formData.title}
         onChange={handleChange}
@@ -95,11 +81,9 @@ const PortfolioForm = ({ onSubmit, onCancel, loading = false }) => {
         required
       />
 
-      {/* Portfolio Slug */}
       <Input
-        label="Portfolio Slug"
+        label="Portfolio slug"
         name="slug"
-        type="text"
         placeholder="my-developer-portfolio"
         value={formData.slug}
         onChange={handleChange}
@@ -107,15 +91,10 @@ const PortfolioForm = ({ onSubmit, onCancel, loading = false }) => {
         required
       />
 
-      {/* Description */}
       <div className="w-full">
-        <label
-          htmlFor="description"
-          className="mb-2 block text-sm font-medium text-gray-300"
-        >
+        <label htmlFor="description" className={labelClass}>
           Description
         </label>
-
         <textarea
           id="description"
           name="description"
@@ -123,45 +102,33 @@ const PortfolioForm = ({ onSubmit, onCancel, loading = false }) => {
           placeholder="Tell something about your portfolio..."
           value={formData.description}
           onChange={handleChange}
-          className={`w-full rounded-lg border bg-[#0d0e14] px-4 py-3 text-sm text-white placeholder:text-gray-600 outline-none transition ${
-            errors.description
-              ? "border-red-500 focus:ring-2 focus:ring-red-500/20"
-              : "border-gray-700 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/10"
-          }`}
+          className={errors.description ? fieldErrorClass : fieldClass}
         />
-
         <div className="mt-1.5 flex justify-between">
           {errors.description ? (
-            <p className="text-sm text-red-400">
-              {errors.description}
-            </p>
+            <p className="text-sm text-red-600">{errors.description}</p>
           ) : (
             <span />
           )}
-
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-muted">
             {formData.description.length}/1000
           </span>
         </div>
       </div>
 
-      {/* Technologies */}
-      <div className="w-full">
+      <div>
         <Input
           label="Technologies"
           name="technologies"
-          type="text"
           placeholder="React, Node.js, MongoDB"
           value={formData.technologies}
           onChange={handleChange}
         />
-
-        <p className="mt-1.5 text-xs text-gray-500">
+        <p className="mt-1.5 text-xs text-muted">
           Separate technologies with commas
         </p>
       </div>
 
-      {/* Live URL */}
       <Input
         label="Live URL"
         name="liveUrl"
@@ -171,7 +138,6 @@ const PortfolioForm = ({ onSubmit, onCancel, loading = false }) => {
         onChange={handleChange}
       />
 
-      {/* GitHub URL */}
       <Input
         label="GitHub URL"
         name="githubUrl"
@@ -181,9 +147,8 @@ const PortfolioForm = ({ onSubmit, onCancel, loading = false }) => {
         onChange={handleChange}
       />
 
-      {/* Featured Image */}
       <Input
-        label="Featured Image URL"
+        label="Featured image URL"
         name="featuredImage"
         type="url"
         placeholder="https://example.com/image.png"
@@ -191,22 +156,11 @@ const PortfolioForm = ({ onSubmit, onCancel, loading = false }) => {
         onChange={handleChange}
       />
 
-      {/* Buttons */}
-      <div className="flex gap-3 pt-2">
-        <Button
-          type="submit"
-          loading={loading}
-          loadingText="Creating..."
-        >
-          Create Portfolio
+      <div className="flex flex-wrap gap-3 pt-2">
+        <Button type="submit" loading={loading} loadingText="Creating...">
+          Create portfolio
         </Button>
-
-        <Button
-          type="button"
-          onClick={onCancel}
-          disabled={loading}
-          className="border border-gray-700 bg-transparent text-gray-300 hover:border-cyan-400 hover:bg-transparent hover:text-cyan-400"
-        >
+        <Button type="button" variant="secondary" onClick={onCancel} disabled={loading}>
           Cancel
         </Button>
       </div>

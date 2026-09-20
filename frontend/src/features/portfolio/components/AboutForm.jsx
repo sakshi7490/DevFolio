@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import Button from "../../../components/common/Button";
+import Alert from "../../../components/common/Alert";
 import portfolioService from "../portfolioService";
+import { cardClass, fieldClass, labelClass } from "../../../styles/ui";
 
 const AboutForm = ({ portfolioId }) => {
   const [content, setContent] = useState("");
@@ -13,18 +15,14 @@ const AboutForm = ({ portfolioId }) => {
     const fetchAbout = async () => {
       try {
         setLoading(true);
-
-        const response =
-          await portfolioService.getAbout(portfolioId);
-
+        const response = await portfolioService.getAbout(portfolioId);
         if (response.data) {
           setContent(response.data.content || "");
         }
-      } catch (error) {
-        if (error.response?.status !== 404) {
+      } catch (err) {
+        if (err.response?.status !== 404) {
           setError(
-            error.response?.data?.message ||
-              "Failed to load About section"
+            err.response?.data?.message || "Failed to load About section",
           );
         }
       } finally {
@@ -42,17 +40,10 @@ const AboutForm = ({ portfolioId }) => {
       setSaving(true);
       setMessage("");
       setError("");
-
-      await portfolioService.updateAbout(portfolioId, {
-        content,
-      });
-
+      await portfolioService.updateAbout(portfolioId, { content });
       setMessage("About section saved successfully.");
-    } catch (error) {
-      setError(
-        error.response?.data?.message ||
-          "Failed to save About section"
-      );
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to save About section");
     } finally {
       setSaving(false);
     }
@@ -60,46 +51,35 @@ const AboutForm = ({ portfolioId }) => {
 
   if (loading) {
     return (
-      <div className="h-80 animate-pulse rounded-xl border border-gray-800 bg-[#0d0e14]" />
+      <div className="h-80 animate-pulse rounded-2xl border border-stone-200 bg-white" />
     );
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="rounded-xl border border-gray-800 bg-[#0d0e14] p-6 md:p-8"
-    >
+    <form onSubmit={handleSubmit} className={cardClass}>
       <div className="mb-6">
-        <h2 className="text-lg font-semibold text-white">
-          About
-        </h2>
-
-        <p className="mt-1 text-sm text-gray-500">
+        <h2 className="text-lg font-semibold text-ink">About</h2>
+        <p className="mt-1 text-sm text-muted">
           Tell visitors about yourself, your background, and what you do.
         </p>
       </div>
 
       {error && (
-        <div className="mb-5 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+        <Alert type="error" className="mb-5">
           {error}
-        </div>
+        </Alert>
       )}
-
       {message && (
-        <div className="mb-5 rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-400">
+        <Alert type="success" className="mb-5">
           {message}
-        </div>
+        </Alert>
       )}
 
       <div className="space-y-5">
         <div>
-          <label
-            htmlFor="about-content"
-            className="mb-2 block text-sm font-medium text-gray-300"
-          >
-            About Me
+          <label htmlFor="about-content" className={labelClass}>
+            About me
           </label>
-
           <textarea
             id="about-content"
             value={content}
@@ -111,20 +91,15 @@ const AboutForm = ({ portfolioId }) => {
             placeholder="Write something about yourself..."
             rows={8}
             maxLength={2000}
-            className="w-full resize-y rounded-lg border border-gray-700 bg-[#0d0e14] px-4 py-3 text-sm text-white placeholder:text-gray-600 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/10"
+            className={`${fieldClass} resize-y`}
           />
-
-          <div className="mt-1.5 text-right text-xs text-gray-600">
+          <div className="mt-1.5 text-right text-xs text-muted">
             {content.length}/2000
           </div>
         </div>
 
-        <Button
-          type="submit"
-          loading={saving}
-          loadingText="Saving..."
-        >
-          Save About
+        <Button type="submit" loading={saving} loadingText="Saving...">
+          Save about
         </Button>
       </div>
     </form>

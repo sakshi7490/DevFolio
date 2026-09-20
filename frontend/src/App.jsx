@@ -11,6 +11,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import PublicRoute from "./routes/PublicRoute";
 import PortfolioSettings from "./features/portfolio/pages/PortfolioSettings";
 import PortfolioEditor from "./features/portfolio/pages/PortfolioEditor";
+import AppLayout from "./components/layout/AppLayout";
 
 function App() {
   return (
@@ -23,27 +24,27 @@ function App() {
       </Route>
 
       <Route element={<ProtectedRoute />}>
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/profile" element={<Profile />} />
-
-        <Route path="/dashboard/portfolios" element={<PortfolioList />} />
-
-        <Route
-          path="/dashboard/portfolios/create"
-          element={<CreatePortfolio />}
-        />
-        <Route
-          path="/dashboard/portfolios/:id"
-          element={<PortfolioDetails />}
-        />
-        <Route
-          path="/dashboard/portfolios/:id/edit"
-          element={<PortfolioEditor />}
-        />
-        <Route
-          path="/dashboard/portfolios/:id/settings"
-          element={<PortfolioSettings />}
-        />
+        <Route element={<AppLayout />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/dashboard/portfolios" element={<PortfolioList />} />
+          <Route
+            path="/dashboard/portfolios/create"
+            element={<CreatePortfolio />}
+          />
+          <Route
+            path="/dashboard/portfolios/:id"
+            element={<PortfolioDetails />}
+          />
+          <Route
+            path="/dashboard/portfolios/:id/edit"
+            element={<PortfolioEditor />}
+          />
+          <Route
+            path="/dashboard/portfolios/:id/settings"
+            element={<PortfolioSettings />}
+          />
+        </Route>
       </Route>
     </Routes>
   );

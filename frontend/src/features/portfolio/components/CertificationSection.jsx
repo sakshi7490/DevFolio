@@ -235,19 +235,19 @@ const CertificationSection = ({ portfolioId }) => {
   };
 
   const inputClass =
-    "w-full rounded-lg border border-white/10 bg-[#08090d] px-3 py-2.5 text-sm text-white placeholder-gray-600 outline-none transition focus:border-cyan-500/50";
+    "w-full rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-sm text-ink placeholder-stone-400 outline-none transition focus:border-accent";
 
   return (
-    <section className="w-full rounded-2xl border border-white/10 bg-[#0d0e14] p-5 shadow-xl sm:p-6">
+    <section className="w-full rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-6">
 
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-white">
+          <h2 className="text-lg font-semibold text-ink">
             Certifications
           </h2>
 
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-muted">
             Showcase your certifications and credentials.
           </p>
         </div>
@@ -257,8 +257,8 @@ const CertificationSection = ({ portfolioId }) => {
           onClick={() => setVisible((prev) => !prev)}
           className={`relative h-6 w-11 shrink-0 rounded-full transition ${
             visible
-              ? "bg-cyan-500"
-              : "bg-gray-700"
+              ? "bg-accent"
+              : "bg-stone-300"
           }`}
           aria-label="Toggle certifications visibility"
         >
@@ -274,13 +274,13 @@ const CertificationSection = ({ portfolioId }) => {
         <>
           {/* Messages */}
           {error && (
-            <div className="mt-5 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+            <div className="mt-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               {error}
             </div>
           )}
 
           {success && (
-            <div className="mt-5 rounded-lg border border-cyan-500/20 bg-cyan-500/10 px-4 py-3 text-sm text-cyan-400">
+            <div className="mt-5 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
               {success}
             </div>
           )}
@@ -289,16 +289,16 @@ const CertificationSection = ({ portfolioId }) => {
           <div className="mt-6">
             {loading ? (
               <div className="space-y-3">
-                <div className="h-28 animate-pulse rounded-xl bg-white/[0.03]" />
-                <div className="h-28 animate-pulse rounded-xl bg-white/[0.03]" />
+                <div className="h-28 animate-pulse rounded-xl bg-canvas" />
+                <div className="h-28 animate-pulse rounded-xl bg-canvas" />
               </div>
             ) : certifications.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-white/10 px-5 py-8 text-center">
-                <p className="text-sm text-gray-400">
+              <div className="rounded-xl border border-dashed border-stone-300 px-5 py-8 text-center">
+                <p className="text-sm text-stone-600">
                   No certifications added yet.
                 </p>
 
-                <p className="mt-1 text-xs text-gray-600">
+                <p className="mt-1 text-xs text-muted">
                   Add your professional certifications below.
                 </p>
               </div>
@@ -307,8 +307,8 @@ const CertificationSection = ({ portfolioId }) => {
                 {certifications.map((item) => (
                   <div key={item._id}>
                     {editingId === item._id ? (
-                      /* Edit Form */
-                      <div className="rounded-xl border border-cyan-500/20 bg-[#10121a] p-4">
+                      /* Edit */
+                      <div className="rounded-xl border border-accent/20 bg-emerald-50/40 p-4">
                         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
 
                           <input
@@ -338,9 +338,7 @@ const CertificationSection = ({ portfolioId }) => {
                           <input
                             type="url"
                             name="credentialUrl"
-                            value={
-                              editingForm.credentialUrl
-                            }
+                            value={editingForm.credentialUrl}
                             onChange={handleEditChange}
                             placeholder="Credential URL"
                             className={inputClass}
@@ -348,9 +346,7 @@ const CertificationSection = ({ portfolioId }) => {
 
                           <textarea
                             name="description"
-                            value={
-                              editingForm.description
-                            }
+                            value={editingForm.description}
                             onChange={handleEditChange}
                             placeholder="Description"
                             rows={3}
@@ -367,7 +363,7 @@ const CertificationSection = ({ portfolioId }) => {
                             disabled={
                               savingId === item._id
                             }
-                            className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-black transition hover:bg-cyan-400 disabled:opacity-50"
+                            className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-50"
                           >
                             {savingId === item._id
                               ? "Saving..."
@@ -377,7 +373,7 @@ const CertificationSection = ({ portfolioId }) => {
                           <button
                             type="button"
                             onClick={cancelEditing}
-                            className="rounded-lg border border-white/10 px-4 py-2 text-sm text-gray-400 transition hover:border-white/20 hover:text-white"
+                            className="rounded-lg border border-stone-200 px-4 py-2 text-sm text-stone-600 transition hover:text-ink"
                           >
                             Cancel
                           </button>
@@ -385,30 +381,28 @@ const CertificationSection = ({ portfolioId }) => {
                       </div>
                     ) : (
                       /* Certification Card */
-                      <div className="group rounded-xl border border-white/10 bg-[#10121a] p-4 transition hover:border-cyan-500/20">
+                      <div className="group rounded-xl border border-stone-200 bg-canvas p-4 transition hover:border-accent/30">
 
                         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 
                           <div className="min-w-0">
-                            <h3 className="text-base font-semibold text-white">
+                            <h3 className="text-base font-semibold text-ink">
                               {item.name}
                             </h3>
 
-                            <p className="mt-1 text-sm font-medium text-cyan-400">
+                            <p className="mt-1 text-sm font-medium text-accent">
                               {item.issuer}
                             </p>
 
                             {item.issueDate && (
-                              <p className="mt-2 text-xs text-gray-500">
+                              <p className="mt-2 text-xs text-muted">
                                 Issued{" "}
-                                {formatDate(
-                                  item.issueDate
-                                )}
+                                {formatDate(item.issueDate)}
                               </p>
                             )}
 
                             {item.description && (
-                              <p className="mt-3 border-t border-white/5 pt-3 text-sm leading-6 text-gray-500">
+                              <p className="mt-3 border-t border-stone-200 pt-3 text-sm leading-6 text-muted">
                                 {item.description}
                               </p>
                             )}
@@ -418,7 +412,7 @@ const CertificationSection = ({ portfolioId }) => {
                                 href={item.credentialUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="mt-3 inline-flex text-xs font-medium text-cyan-400 transition hover:text-cyan-300"
+                                className="mt-3 inline-flex text-xs font-medium text-accent transition hover:text-emerald-700"
                               >
                                 View Credential ↗
                               </a>
@@ -431,7 +425,7 @@ const CertificationSection = ({ portfolioId }) => {
                               onClick={() =>
                                 startEditing(item)
                               }
-                              className="text-xs text-gray-500 transition hover:text-cyan-400"
+                              className="text-xs text-muted transition hover:text-accent"
                             >
                               Edit
                             </button>
@@ -444,7 +438,7 @@ const CertificationSection = ({ portfolioId }) => {
                               disabled={
                                 deletingId === item._id
                               }
-                              className="text-xs text-gray-500 transition hover:text-red-400 disabled:opacity-50"
+                              className="text-xs text-muted transition hover:text-red-600 disabled:opacity-50"
                             >
                               {deletingId === item._id
                                 ? "..."
@@ -462,8 +456,8 @@ const CertificationSection = ({ portfolioId }) => {
           </div>
 
           {/* Add Certification */}
-          <div className="mt-6 border-t border-white/5 pt-5">
-            <p className="mb-4 text-sm font-medium text-gray-300">
+          <div className="mt-6 border-t border-stone-100 pt-5">
+            <p className="mb-4 text-sm font-medium text-stone-700">
               Add certification
             </p>
 
@@ -516,7 +510,7 @@ const CertificationSection = ({ portfolioId }) => {
               <button
                 type="submit"
                 disabled={adding}
-                className="mt-4 rounded-lg bg-cyan-500 px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+                className="mt-4 rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {adding
                   ? "Adding..."

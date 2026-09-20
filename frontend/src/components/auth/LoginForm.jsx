@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { ArrowRight } from "lucide-react";
 
 import useAuth from "../../hooks/useAuth";
-
 import Input from "../common/Input";
 import PasswordInput from "../common/PasswordInput";
 import Button from "../common/Button";
@@ -55,101 +55,56 @@ const LoginForm = () => {
 
     try {
       setLoading(true);
-
       await login(formData);
-
       toast.success("Login successful!");
-
       navigate("/dashboard");
     } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Login failed"
-      );
+      toast.error(error.response?.data?.message || "Login failed");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex flex-col gap-5"
-    >
-
-      {/* Email */}
+    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       <Input
         label="Email"
         type="email"
         name="email"
-        placeholder="Enter your email"
+        placeholder="you@domain.com"
         value={formData.email}
         onChange={handleChange}
         error={errors.email}
         required
       />
 
-      {/* Password */}
       <PasswordInput
         label="Password"
         name="password"
-        placeholder="Enter your password"
+        placeholder="Your password"
         value={formData.password}
         onChange={handleChange}
         error={errors.password}
         required
       />
 
-      {/* Forgot Password */}
       <div className="-mt-2 flex justify-end">
-        <button
-          type="button"
-          className="
-            text-sm
-            font-medium
-            text-purple-400
-            transition
-            hover:text-cyan-400
-          "
-        >
-          Forgot Password?
+        <button type="button" className="text-sm font-medium text-accent hover:text-emerald-800">
+          Forgot password?
         </button>
       </div>
 
-      {/* Login */}
-      <Button
-        type="submit"
-        loading={loading}
-        loadingText="Logging in..."
-        className="
-          bg-gradient-to-r
-          from-cyan-500
-          to-purple-600
-          py-3
-          shadow-lg
-          shadow-purple-500/20
-          hover:from-cyan-400
-          hover:to-purple-500
-        "
-      >
-        Login
+      <Button type="submit" loading={loading} loadingText="Signing in..." className="w-full">
+        Sign in
+        <ArrowRight size={16} />
       </Button>
 
-      {/* Register */}
-      <p className="pt-1 text-center text-sm text-gray-400">
-        Don't have an account?{" "}
-        <Link
-          to="/register"
-          className="
-            font-semibold
-            text-cyan-400
-            transition
-            hover:text-purple-400
-          "
-        >
-          Create Account
+      <p className="pt-1 text-center text-sm text-muted">
+        New here?{" "}
+        <Link to="/register" className="font-semibold text-accent hover:text-emerald-800">
+          Create your DevFolio
         </Link>
       </p>
-
     </form>
   );
 };

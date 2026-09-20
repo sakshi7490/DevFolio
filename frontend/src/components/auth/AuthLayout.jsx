@@ -1,83 +1,61 @@
-import heroImage from "../../assets/hero.png";
-import logo from "../../assets/devfolio-logo.png";
+import Logo from "../common/Logo";
 
-const AuthLayout = ({ title, subtitle, children }) => {
+const AuthLayout = ({
+  title,
+  subtitle,
+  eyebrow = "Start building",
+  panelEyebrow = "Your work, in context",
+  panelTitle = "Make the proof of your work easy to trust.",
+  panelBody = "One focused place for the projects, decisions, and experience that make you the developer you are.",
+  panelFoot = "01  Collect the signal. Publish the story.",
+  children,
+}) => {
   return (
-    <div className="mx-auto grid min-h-screen max-w-7xl grid-cols-1 items-center gap-12 px-6 py-10 lg:grid-cols-2 lg:px-12">
+    <div className="auth-grid min-h-screen px-4 py-6 sm:px-8 sm:py-10">
+      <div className="mx-auto flex min-h-[calc(100vh-3.5rem)] w-full max-w-6xl flex-col">
+        <header className="mb-8">
+          <Logo to="/login" />
+        </header>
 
-      {/* ================= LEFT SECTION ================= */}
-      <div className="flex flex-col items-center justify-center text-center lg:items-start lg:text-left">
+        <div className="flex flex-1 items-center justify-center pb-8">
+          <div className="grid w-full overflow-hidden rounded-[28px] border border-stone-200/80 bg-white shadow-[0_30px_80px_rgba(27,35,48,0.12)] lg:grid-cols-[1.05fr_1fr]">
+            <aside className="relative hidden min-h-[560px] flex-col justify-between overflow-hidden bg-navy px-10 py-12 text-white lg:flex">
+              <div className="pointer-events-none absolute -right-16 -top-24 h-72 w-72 rounded-full border border-white/10" />
+              <div className="pointer-events-none absolute -bottom-20 right-10 h-64 w-64 rounded-full border border-white/10" />
 
-        <img
-          src={heroImage}
-          alt="Developer Illustration"
-          className="w-full max-w-[600px] rounded-xl object-cover"
-          draggable={false}
-        />
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/45">
+                {panelEyebrow}
+              </p>
 
-        <h1 className="mt-6 text-5xl font-extrabold tracking-tight text-white lg:text-6xl">
-          DEVFOLIO
-        </h1>
+              <div className="relative max-w-md">
+                <h1 className="font-display text-[2.6rem] leading-[1.15] font-medium tracking-tight">
+                  {panelTitle}
+                </h1>
+                <p className="mt-5 max-w-sm text-sm leading-7 text-white/65">
+                  {panelBody}
+                </p>
+              </div>
 
-        <p className="mt-3 max-w-[620px] text-base leading-7 text-gray-400 lg:text-lg">
-          Build your professional developer portfolio, showcase your skills,
-          projects, and achievements to impress recruiters worldwide.
-        </p>
+              <p className="relative text-xs tracking-wide text-white/40">
+                {panelFoot}
+              </p>
+            </aside>
 
-      </div>
-
-      {/* ================= RIGHT SECTION ================= */}
-      <div className="flex items-center justify-center">
-
-        <div
-          className="
-            w-full max-w-[480px]
-            rounded-2xl
-            border border-purple-500/30
-            bg-[#15161d]
-            px-7 py-8
-            shadow-[0_0_50px_rgba(124,58,237,0.12)]
-            sm:px-9 sm:py-10
-          "
-        >
-
-          {/* Logo */}
-          <div className="mb-7 flex justify-center">
-            <div
-              className="
-                flex h-24 w-24
-                items-center justify-center
-                rounded-2xl
-                border border-cyan-400/20
-                bg-[#11121a]
-                shadow-[0_0_25px_rgba(34,211,238,0.08)]
-              "
-            >
-              <img
-                src={logo}
-                alt="DevFolio Logo"
-                className="h-16 w-16 object-contain"
-              />
+            <div className="flex flex-col justify-center bg-white px-6 py-10 sm:px-10 lg:px-12">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-accent">
+                {eyebrow}
+              </p>
+              <h2 className="mt-2 font-display text-3xl font-medium tracking-tight text-ink sm:text-[2.1rem]">
+                {title}
+              </h2>
+              {subtitle && (
+                <p className="mt-2 text-sm text-muted">{subtitle}</p>
+              )}
+              <div className="mt-8">{children}</div>
             </div>
           </div>
-
-          {/* Heading */}
-          <div className="mb-7 text-center">
-            <h2 className="!m-0 text-3xl font-bold tracking-tight text-white sm:text-4xl">
-              {title}
-            </h2>
-
-            <p className="mt-2 !text-base leading-6 text-gray-400">
-              {subtitle}
-            </p>
-          </div>
-
-          {/* Form */}
-          {children}
-
         </div>
       </div>
-
     </div>
   );
 };

@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import portfolioService from "../portfolioService";
 
-const EducationSection = ({ portfolioId }) => {
-  const [education, setEducation] = useState([]);
+const ExperienceSection = ({ portfolioId }) => {
+  const [experiences, setExperiences] = useState([]);
 
   const [form, setForm] = useState({
-    institution: "",
-    degree: "",
-    fieldOfStudy: "",
+    company: "",
+    position: "",
+    location: "",
     startDate: "",
     endDate: "",
+    isCurrent: false,
     description: "",
   });
 
@@ -26,22 +27,22 @@ const EducationSection = ({ portfolioId }) => {
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
-    loadEducation();
+    loadExperiences();
   }, [portfolioId]);
 
-  const loadEducation = async () => {
+  const loadExperiences = async () => {
     try {
       setLoading(true);
       setError("");
 
       const response =
-        await portfolioService.getEducation(portfolioId);
+        await portfolioService.getExperiences(portfolioId);
 
-      setEducation(response.data || []);
+      setExperiences(response.data || []);
     } catch (err) {
       setError(
         err.response?.data?.message ||
-          "Failed to load education"
+          "Failed to load experience"
       );
     } finally {
       setLoading(false);
@@ -57,17 +58,40 @@ const EducationSection = ({ portfolioId }) => {
   };
 
   const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+
     setForm((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name]: type === "checkbox" ? checked : value,
     }));
+
+    setError("");
   };
 
   const handleAdd = async (e) => {
     e.preventDefault();
 
-    if (!form.institution.trim() || !form.degree.trim()) {
-      setError("Institution and degree are required");
+    if (!form.company.trim()) {
+      setError("Company name is required");
+      return;
+    }
+
+    if (!form.position.trim()) {
+      setError("Position is required");
+      return;
+    }
+
+    if (!form.startDate) {
+      setError("Start date is required");
+      return;
+    }
+
+    if (
+      !form.isCurrent &&
+      form.endDate &&
+      form.endDate < form.startDate
+    ) {
+      setError("End date cannot be before start date");
       return;
     }
 
@@ -76,36 +100,41 @@ const EducationSection = ({ portfolioId }) => {
       setError("");
 
       const response =
-        await portfolioService.createEducation(
+        await portfolioService.createExperience(
           portfolioId,
           {
-            ...form,
-            institution: form.institution.trim(),
-            degree: form.degree.trim(),
-            fieldOfStudy: form.fieldOfStudy.trim(),
+            company: form.company.trim(),
+            position: form.position.trim(),
+            location: form.location.trim(),
+            startDate: form.startDate,
+            endDate: form.isCurrent
+              ? null
+              : form.endDate || null,
+            isCurrent: form.isCurrent,
             description: form.description.trim(),
           }
         );
 
-      setEducation((prev) => [
-        ...prev,
+      setExperiences((prev) => [
         response.data,
+        ...prev,
       ]);
 
       setForm({
-        institution: "",
-        degree: "",
-        fieldOfStudy: "",
+        company: "",
+        position: "",
+        location: "",
         startDate: "",
         endDate: "",
+        isCurrent: false,
         description: "",
       });
 
-      showSuccess("Education added successfully");
+      showSuccess("Experience added successfully");
     } catch (err) {
       setError(
         err.response?.data?.message ||
-          "Failed to add education"
+          "Failed to add experience"
       );
     } finally {
       setAdding(false);
@@ -116,26 +145,32 @@ const EducationSection = ({ portfolioId }) => {
     setEditingId(item._id);
 
     setEditingForm({
-      institution: item.institution || "",
-      degree: item.degree || "",
-      fieldOfStudy: item.fieldOfStudy || "",
+      company: item.company || "",
+      position: item.position || "",
+      location: item.location || "",
       startDate: item.startDate
         ? item.startDate.split("T")[0]
         : "",
       endDate: item.endDate
         ? item.endDate.split("T")[0]
         : "",
+      isCurrent: item.isCurrent || false,
       description: item.description || "",
     });
 
     setError("");
+    setSuccess("");
   };
 
   const handleEditChange = (e) => {
+    const { name, value, type, checked } = e.target;
+
     setEditingForm((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name]: type === "checkbox" ? checked : value,
     }));
+
+    setError("");
   };
 
   const cancelEditing = () => {
@@ -143,76 +178,100 @@ const EducationSection = ({ portfolioId }) => {
     setEditingForm({});
   };
 
-  const handleUpdate = async (educationId) => {
+  const handleUpdate = async (experienceId) => {
+    if (!editingForm.company?.trim()) {
+      setError("Company name is required");
+      return;
+    }
+
+    if (!editingForm.position?.trim()) {
+      setError("Position is required");
+      return;
+    }
+
+    if (!editingForm.startDate) {
+      setError("Start date is required");
+      return;
+    }
+
     if (
-      !editingForm.institution?.trim() ||
-      !editingForm.degree?.trim()
+      !editingForm.isCurrent &&
+      editingForm.endDate &&
+      editingForm.endDate < editingForm.startDate
     ) {
-      setError("Institution and degree are required");
+      setError("End date cannot be before start date");
       return;
     }
 
     try {
-      setSavingId(educationId);
+      setSavingId(experienceId);
       setError("");
 
       const response =
-        await portfolioService.updateEducation(
+        await portfolioService.updateExperience(
           portfolioId,
-          educationId,
+          experienceId,
           {
-            ...editingForm,
-            institution:
-              editingForm.institution.trim(),
-            degree: editingForm.degree.trim(),
-            fieldOfStudy:
-              editingForm.fieldOfStudy?.trim() || "",
+            company: editingForm.company.trim(),
+            position: editingForm.position.trim(),
+            location:
+              editingForm.location?.trim() || "",
+            startDate: editingForm.startDate,
+            endDate: editingForm.isCurrent
+              ? null
+              : editingForm.endDate || null,
+            isCurrent: editingForm.isCurrent,
             description:
               editingForm.description?.trim() || "",
           }
         );
 
-      setEducation((prev) =>
+      setExperiences((prev) =>
         prev.map((item) =>
-          item._id === educationId
+          item._id === experienceId
             ? response.data
             : item
         )
       );
 
       cancelEditing();
-      showSuccess("Education updated successfully");
+
+      showSuccess("Experience updated successfully");
     } catch (err) {
       setError(
         err.response?.data?.message ||
-          "Failed to update education"
+          "Failed to update experience"
       );
     } finally {
       setSavingId(null);
     }
   };
 
-  const handleDelete = async (educationId) => {
+  const handleDelete = async (experienceId) => {
+    if (!window.confirm("Delete this experience?")) {
+      return;
+    }
+
     try {
-      setDeletingId(educationId);
+      setDeletingId(experienceId);
       setError("");
 
-      await portfolioService.deleteEducation(
+      await portfolioService.deleteExperience(
         portfolioId,
-        educationId
+        experienceId
       );
 
-      setEducation((prev) =>
+      setExperiences((prev) =>
         prev.filter(
-          (item) => item._id !== educationId
+          (item) => item._id !== experienceId
         )
       );
 
-      showSuccess("Education removed");
+      showSuccess("Experience removed");
     } catch (err) {
       setError(
         err.response?.data?.message ||
-          "Failed to delete education"
+          "Failed to delete experience"
       );
     } finally {
       setDeletingId(null);
@@ -241,22 +300,25 @@ const EducationSection = ({ portfolioId }) => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-ink">
-            Education
+            Experience
           </h2>
 
           <p className="mt-1 text-sm text-muted">
-            Add your academic background and journey.
+            Showcase your professional experience and career journey.
           </p>
         </div>
 
         <button
           type="button"
-          onClick={() => setVisible((prev) => !prev)}
+          onClick={() =>
+            setVisible((prev) => !prev)
+          }
           className={`relative h-6 w-11 shrink-0 rounded-full transition ${
             visible
               ? "bg-accent"
               : "bg-stone-300"
           }`}
+          aria-label="Toggle experience visibility"
         >
           <span
             className={`absolute top-1 h-4 w-4 rounded-full bg-white transition-all ${
@@ -281,53 +343,56 @@ const EducationSection = ({ portfolioId }) => {
             </div>
           )}
 
-          {/* Education List */}
+          {/* Experience List */}
           <div className="mt-6">
             {loading ? (
               <div className="space-y-3">
-                <div className="h-28 animate-pulse rounded-xl bg-canvas" />
-                <div className="h-28 animate-pulse rounded-xl bg-canvas" />
+                <div className="h-32 animate-pulse rounded-xl bg-canvas" />
+                <div className="h-32 animate-pulse rounded-xl bg-canvas" />
               </div>
-            ) : education.length === 0 ? (
+            ) : experiences.length === 0 ? (
               <div className="rounded-xl border border-dashed border-stone-300 px-5 py-8 text-center">
                 <p className="text-sm text-stone-600">
-                  No education added yet.
+                  No experience added yet.
                 </p>
 
                 <p className="mt-1 text-xs text-muted">
-                  Add your academic background below.
+                  Add your professional experience below.
                 </p>
               </div>
             ) : (
               <div className="space-y-4">
-                {education.map((item) => (
+                {experiences.map((item) => (
                   <div key={item._id}>
+
                     {editingId === item._id ? (
-                      /* Edit */
+
+                      /* Edit Experience */
                       <div className="rounded-xl border border-accent/20 bg-emerald-50/40 p-4">
+
                         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
 
                           <input
-                            name="institution"
-                            value={editingForm.institution}
+                            name="company"
+                            value={editingForm.company}
                             onChange={handleEditChange}
-                            placeholder="Institution"
+                            placeholder="Company name *"
                             className={inputClass}
                           />
 
                           <input
-                            name="degree"
-                            value={editingForm.degree}
+                            name="position"
+                            value={editingForm.position}
                             onChange={handleEditChange}
-                            placeholder="Degree"
+                            placeholder="Position / Job title *"
                             className={inputClass}
                           />
 
                           <input
-                            name="fieldOfStudy"
-                            value={editingForm.fieldOfStudy}
+                            name="location"
+                            value={editingForm.location}
                             onChange={handleEditChange}
-                            placeholder="Field of study"
+                            placeholder="Location"
                             className={inputClass}
                           />
 
@@ -344,20 +409,40 @@ const EducationSection = ({ portfolioId }) => {
                             name="endDate"
                             value={editingForm.endDate}
                             onChange={handleEditChange}
-                            className={inputClass}
+                            disabled={editingForm.isCurrent}
+                            className={`${inputClass} disabled:cursor-not-allowed disabled:bg-stone-100 disabled:text-stone-400`}
                           />
+
+                          <label className="flex items-center gap-3 rounded-xl border border-stone-200 bg-white px-3 py-2.5">
+                            <input
+                              id={`current-edit-${item._id}`}
+                              type="checkbox"
+                              name="isCurrent"
+                              checked={
+                                editingForm.isCurrent
+                              }
+                              onChange={handleEditChange}
+                              className="h-4 w-4 accent-emerald-600"
+                            />
+
+                            <span className="text-sm text-stone-600">
+                              Currently working here
+                            </span>
+                          </label>
 
                           <textarea
                             name="description"
                             value={editingForm.description}
                             onChange={handleEditChange}
-                            placeholder="Description"
-                            rows={3}
+                            placeholder="Describe your responsibilities, achievements, etc."
+                            rows={4}
+                            maxLength={2000}
                             className={`${inputClass} resize-none md:col-span-2`}
                           />
                         </div>
 
                         <div className="mt-4 flex gap-2">
+
                           <button
                             type="button"
                             onClick={() =>
@@ -380,39 +465,40 @@ const EducationSection = ({ portfolioId }) => {
                           >
                             Cancel
                           </button>
+
                         </div>
                       </div>
+
                     ) : (
-                      /* Education Card */
+
+                      /* Experience Card */
                       <div className="group rounded-xl border border-stone-200 bg-canvas p-4 transition hover:border-accent/30">
 
                         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 
                           <div className="min-w-0">
+
                             <h3 className="text-base font-semibold text-ink">
-                              {item.degree}
+                              {item.position}
                             </h3>
 
                             <p className="mt-1 text-sm font-medium text-accent">
-                              {item.institution}
+                              {item.company}
                             </p>
 
-                            {item.fieldOfStudy && (
+                            {item.location && (
                               <p className="mt-1 text-sm text-stone-600">
-                                {item.fieldOfStudy}
+                                {item.location}
                               </p>
                             )}
 
-                            {(item.startDate ||
-                              item.endDate) && (
-                              <p className="mt-2 text-xs text-muted">
-                                {formatDate(item.startDate)}
-                                {" — "}
-                                {item.endDate
-                                  ? formatDate(item.endDate)
-                                  : "Present"}
-                              </p>
-                            )}
+                            <p className="mt-2 text-xs text-muted">
+                              {formatDate(item.startDate)}
+                              {" — "}
+                              {item.isCurrent
+                                ? "Present"
+                                : formatDate(item.endDate)}
+                            </p>
 
                             {item.description && (
                               <p className="mt-3 border-t border-stone-200 pt-3 text-sm leading-6 text-muted">
@@ -422,6 +508,7 @@ const EducationSection = ({ portfolioId }) => {
                           </div>
 
                           <div className="flex shrink-0 gap-3">
+
                             <button
                               type="button"
                               onClick={() =>
@@ -446,6 +533,7 @@ const EducationSection = ({ portfolioId }) => {
                                 ? "..."
                                 : "Remove"}
                             </button>
+
                           </div>
 
                         </div>
@@ -457,36 +545,38 @@ const EducationSection = ({ portfolioId }) => {
             )}
           </div>
 
-          {/* Add Education */}
+          {/* Add Experience */}
           <div className="mt-6 border-t border-stone-100 pt-5">
+
             <p className="mb-4 text-sm font-medium text-stone-700">
-              Add education
+              Add experience
             </p>
 
             <form onSubmit={handleAdd}>
+
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
 
                 <input
-                  name="institution"
-                  value={form.institution}
+                  name="company"
+                  value={form.company}
                   onChange={handleChange}
-                  placeholder="Institution *"
+                  placeholder="Company name *"
                   className={inputClass}
                 />
 
                 <input
-                  name="degree"
-                  value={form.degree}
+                  name="position"
+                  value={form.position}
                   onChange={handleChange}
-                  placeholder="Degree *"
+                  placeholder="Position / Job title *"
                   className={inputClass}
                 />
 
                 <input
-                  name="fieldOfStudy"
-                  value={form.fieldOfStudy}
+                  name="location"
+                  value={form.location}
                   onChange={handleChange}
-                  placeholder="Field of study"
+                  placeholder="Location"
                   className={inputClass}
                 />
 
@@ -503,17 +593,37 @@ const EducationSection = ({ portfolioId }) => {
                   name="endDate"
                   value={form.endDate}
                   onChange={handleChange}
-                  className={inputClass}
+                  disabled={form.isCurrent}
+                  className={`${inputClass} disabled:cursor-not-allowed disabled:bg-stone-100 disabled:text-stone-400`}
                 />
+
+                <label className="flex items-center gap-3 rounded-xl border border-stone-200 bg-white px-3 py-2.5">
+
+                  <input
+                    id="current-experience"
+                    type="checkbox"
+                    name="isCurrent"
+                    checked={form.isCurrent}
+                    onChange={handleChange}
+                    className="h-4 w-4 accent-emerald-600"
+                  />
+
+                  <span className="text-sm text-stone-600">
+                    Currently working here
+                  </span>
+
+                </label>
 
                 <textarea
                   name="description"
                   value={form.description}
                   onChange={handleChange}
-                  placeholder="Brief description"
-                  rows={3}
+                  placeholder="Describe your responsibilities, achievements, etc."
+                  rows={4}
+                  maxLength={2000}
                   className={`${inputClass} resize-none md:col-span-2`}
                 />
+
               </div>
 
               <button
@@ -523,8 +633,9 @@ const EducationSection = ({ portfolioId }) => {
               >
                 {adding
                   ? "Adding..."
-                  : "+ Add Education"}
+                  : "+ Add Experience"}
               </button>
+
             </form>
           </div>
         </>
@@ -533,4 +644,4 @@ const EducationSection = ({ portfolioId }) => {
   );
 };
 
-export default EducationSection;
+export default ExperienceSection;
