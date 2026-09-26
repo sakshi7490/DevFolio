@@ -4,7 +4,7 @@ import Alert from "../../../components/common/Alert";
 import portfolioService from "../portfolioService";
 import { cardClass, fieldClass, labelClass } from "../../../styles/ui";
 
-const AboutForm = ({ portfolioId }) => {
+const AboutForm = ({ portfolioId, onDirtyChange }) => {
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -41,6 +41,7 @@ const AboutForm = ({ portfolioId }) => {
       setMessage("");
       setError("");
       await portfolioService.updateAbout(portfolioId, { content });
+      onDirtyChange?.(false);
       setMessage("About section saved successfully.");
     } catch (err) {
       setError(err.response?.data?.message || "Failed to save About section");
@@ -85,6 +86,7 @@ const AboutForm = ({ portfolioId }) => {
             value={content}
             onChange={(e) => {
               setContent(e.target.value);
+              onDirtyChange?.(true);
               setMessage("");
               setError("");
             }}
