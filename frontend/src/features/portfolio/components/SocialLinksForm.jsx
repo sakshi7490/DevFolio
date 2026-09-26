@@ -5,7 +5,7 @@ import Alert from "../../../components/common/Alert";
 import portfolioService from "../portfolioService";
 import { cardClass } from "../../../styles/ui";
 
-const SocialLinksForm = ({ portfolioId }) => {
+const SocialLinksForm = ({ portfolioId, onDirtyChange }) => {
   const [formData, setFormData] = useState({
     github: "",
     linkedin: "",
@@ -52,6 +52,7 @@ const SocialLinksForm = ({ portfolioId }) => {
     }));
     setMessage("");
     setError("");
+    onDirtyChange?.(true);
   };
 
   const handleSubmit = async (e) => {
@@ -62,6 +63,7 @@ const SocialLinksForm = ({ portfolioId }) => {
       setMessage("");
       setError("");
       await portfolioService.updateSocial(portfolioId, formData);
+      onDirtyChange?.(false);
       setMessage("Social links saved successfully.");
     } catch (err) {
       setError(err.response?.data?.message || "Failed to save social links");

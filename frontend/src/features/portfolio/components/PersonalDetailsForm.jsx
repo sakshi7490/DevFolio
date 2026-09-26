@@ -5,7 +5,7 @@ import Alert from "../../../components/common/Alert";
 import portfolioService from "../portfolioService";
 import { cardClass, labelClass, fieldClass } from "../../../styles/ui";
 
-const PersonalDetailsForm = ({ portfolioId }) => {
+const PersonalDetailsForm = ({ portfolioId, onDirtyChange }) => {
   const [formData, setFormData] = useState({
     name: "",
     headline: "",
@@ -45,14 +45,18 @@ const PersonalDetailsForm = ({ portfolioId }) => {
   }, [portfolioId]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    setMessage("");
-    setError("");
-  };
+  const { name, value } = e.target;
+
+  setFormData((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
+
+  onDirtyChange?.(true);
+
+  setMessage("");
+  setError("");
+};
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -86,6 +90,7 @@ const PersonalDetailsForm = ({ portfolioId }) => {
       setMessage("");
       setError("");
       await portfolioService.updatePersonal(portfolioId, formData);
+      onDirtyChange?.(false);
       setMessage("Personal details saved successfully.");
     } catch (err) {
       setError(err.response?.data?.message || "Failed to save personal details");
