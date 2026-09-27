@@ -59,8 +59,17 @@ const portfolioSchema = new mongoose.Schema(
       default: "draft",
       required: true,
     },
+    viewCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
 
     featuredImage: {
+      type: String,
+      trim: true,
+    },
+    resumeUrl: {
       type: String,
       trim: true,
     },

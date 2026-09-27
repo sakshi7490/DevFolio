@@ -39,6 +39,26 @@ export const getSinglePortfolio = asyncHandler(async (req, res) => {
   });
 });
 
+export const getPublicPortfolio = asyncHandler(async (req, res) => {
+  const portfolio = await portfolioService.getPublicPortfolio(
+    req.params.slug
+  );
+
+  res.status(200).json({
+    success: true,
+    message: "Public portfolio fetched successfully",
+    data: portfolio,
+  });
+});
+
+export const getPublicResume = asyncHandler(async (req, res) => {
+  const resumeUrl = await portfolioService.getPublicResume(
+    req.params.slug
+  );
+
+  res.redirect(resumeUrl);
+});
+
 
 export const deletePortfolio = asyncHandler(async (req, res) => {
   await portfolioService.deletePortfolio(
