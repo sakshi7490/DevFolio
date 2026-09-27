@@ -333,6 +333,14 @@ const uploadProjectImage = async (
   return response.data;
 };
 
+const getPublicPortfolio = async (slug) => {
+  const response = await api.get(
+    `/portfolios/public/${slug}`
+  );
+
+  return response.data;
+};
+
 export default {
   createPortfolio,
   getPortfolios,
@@ -367,6 +375,7 @@ export default {
   createExperience,
   updateExperience,
   deleteExperience,
-  uploadProjectImage
+  uploadProjectImage,
+  getPublicPortfolio,
 
 };

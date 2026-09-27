@@ -8,6 +8,8 @@ import {
   createPortfolio,
   getUserPortfolios,
   getSinglePortfolio,
+  getPublicPortfolio,
+  getPublicResume,
   deletePortfolio,
   updatePortfolioSettings,
 } from "./portfolio.controller.js";
@@ -21,7 +23,12 @@ router.post("/", protect, validate(createPortfolioSchema), createPortfolio);
 
 router.get("/", protect, getUserPortfolios);
 
+router.get("/public/:slug", getPublicPortfolio);
+
+router.get("/public/:slug/resume", getPublicResume);
+
 router.get("/:id", protect, getSinglePortfolio);
+
 
 router.delete("/:id", protect, deletePortfolio);
 router.patch(

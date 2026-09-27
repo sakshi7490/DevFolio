@@ -12,17 +12,19 @@ import PublicRoute from "./routes/PublicRoute";
 import PortfolioSettings from "./features/portfolio/pages/PortfolioSettings";
 import PortfolioEditor from "./features/portfolio/pages/PortfolioEditor";
 import AppLayout from "./components/layout/AppLayout";
-
+import PublicPortfolio from "./features/portfolio/pages/PublicPortfolio";
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/login" replace />} />
-
+       {/* Public portfolio — no authentication */}
+      <Route path="/portfolio/:slug" element={<PublicPortfolio />} />
+      {/* Only for logged-out users */}
       <Route element={<PublicRoute />}>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Route>
-
+      {/* Only for logged-in users */}
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
