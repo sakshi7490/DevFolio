@@ -66,9 +66,36 @@ const updatePortfolioSettingsSchema = Joi.object({
   }),
 
   status: Joi.string().valid("draft", "published").messages({
-    "any.only": "Status must be either draft or published",
+  "any.only": "Status must be either draft or published",
+}),
+
+template: Joi.string()
+  .valid("minimal", "professional", "creative")
+  .messages({
+    "any.only":
+      "Template must be minimal, professional, or creative",
+  }),
+  themeColor: Joi.string()
+  .valid("orange", "blue", "green", "purple", "red")
+  .messages({
+    "any.only":
+      "Theme color must be orange, blue, green, purple, or red",
+  }),
+  font: Joi.string()
+  .valid("inter", "poppins", "serif", "mono")
+  .messages({
+    "any.only":
+      "Font must be inter, poppins, serif, or mono",
+  }),
+  themeMode: Joi.string()
+  .valid("light", "dark")
+  .messages({
+    "any.only":
+      "Theme mode must be light or dark",
   }),
 })
+
+
   .min(1)
   .messages({
     "object.min": "At least one portfolio setting is required",
