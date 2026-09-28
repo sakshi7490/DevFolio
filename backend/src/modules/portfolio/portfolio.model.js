@@ -59,6 +59,30 @@ const portfolioSchema = new mongoose.Schema(
       default: "draft",
       required: true,
     },
+    template: {
+      type: String,
+      enum: ["minimal", "professional", "creative"],
+      default: "minimal",
+      required: true,
+    },
+    themeColor: {
+      type: String,
+      enum: ["orange", "blue", "green", "purple", "red"],
+      default: "orange",
+      required: true,
+    },
+    font: {
+  type: String,
+  enum: ["inter", "poppins", "serif", "mono"],
+  default: "inter",
+  required: true,
+},
+themeMode: {
+  type: String,
+  enum: ["light", "dark"],
+  default: "dark",
+  required: true,
+},
     viewCount: {
       type: Number,
       default: 0,

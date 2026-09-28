@@ -47,7 +47,7 @@ const AppLayout = () => {
           user={user}
         />
 
-        <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex min-w-0 flex-1 flex-col lg:ml-72">
           <Navbar
             onMenuClick={() => setSidebarOpen(true)}
             user={user}

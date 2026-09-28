@@ -166,6 +166,7 @@ const updatePortfolioSettings = async (
   }
 
   Object.assign(portfolio, settings);
+  console.log("Before save:", portfolio.toObject());
 
   await portfolio.save();
 
