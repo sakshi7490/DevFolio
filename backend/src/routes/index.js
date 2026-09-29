@@ -11,6 +11,7 @@ import educationRoutes from "../modules/portfolio/education.routes.js";
 import certificationRoutes from "../modules/portfolio/certification.routes.js";
 import projectRoutes from "../modules/portfolio/project.routes.js";
 import experienceRoutes from "../modules/portfolio/experience.routes.js";
+import aiRoutes from "../modules/ai/ai.routes.js";
 
 const router = Router();
 
@@ -40,4 +41,8 @@ router.use("/portfolios",educationRoutes);
 router.use("/portfolios", certificationRoutes);
 router.use("/portfolios", projectRoutes);
 router.use("/portfolios", experienceRoutes);
+
+//ai route
+router.use("/ai", aiRoutes);
+
 export default router;
