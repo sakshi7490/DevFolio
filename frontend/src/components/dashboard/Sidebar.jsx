@@ -3,10 +3,6 @@ import {
   LayoutDashboard,
   UserRound,
   FolderKanban,
-  BriefcaseBusiness,
-  GraduationCap,
-  Wrench,
-  Trophy,
   Settings,
   LogOut,
   X,
@@ -18,18 +14,23 @@ const Sidebar = ({ isOpen, onClose, onLogout, user }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const menuItems = [
-    { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
-    { label: "My Profile", icon: UserRound, path: "/profile" },
-    { label: "My Portfolios", icon: FolderKanban, path: "/dashboard/portfolios" },
-    { label: "Projects", icon: FolderKanban },
-    { label: "Experience", icon: BriefcaseBusiness },
-    { label: "Education", icon: GraduationCap },
-    { label: "Skills", icon: Wrench },
-    { label: "Achievements", icon: Trophy },
-    { label: "Settings", icon: Settings },
-  ];
-
+const menuItems = [
+  {
+    label: "Dashboard",
+    icon: LayoutDashboard,
+    path: "/dashboard",
+  },
+  {
+    label: "My Profile",
+    icon: UserRound,
+    path: "/profile",
+  },
+  {
+    label: "My Portfolios",
+    icon: FolderKanban,
+    path: "/dashboard/portfolios",
+  },
+];
   return (
     <>
       {isOpen && (

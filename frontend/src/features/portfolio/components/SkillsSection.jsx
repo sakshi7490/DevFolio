@@ -1,12 +1,8 @@
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import portfolioService from "../portfolioService";
 
-const skillLevels = [
-  "Beginner",
-  "Intermediate",
-  "Advanced",
-  "Expert",
-];
+const skillLevels = ["Beginner", "Intermediate", "Advanced", "Expert"];
 
 const SkillsSection = ({ portfolioId }) => {
   const [skills, setSkills] = useState([]);
@@ -21,6 +17,8 @@ const SkillsSection = ({ portfolioId }) => {
   const [adding, setAdding] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [savingId, setSavingId] = useState(null);
+  const [aiSuggestion, setAiSuggestion] = useState("");
+  const [suggesting, setSuggesting] = useState(false);
 
   const [visible, setVisible] = useState(true);
   const [error, setError] = useState("");
@@ -38,10 +36,7 @@ const SkillsSection = ({ portfolioId }) => {
       const response = await portfolioService.getSkills(portfolioId);
       setSkills(response.data || []);
     } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          "Failed to load skills"
-      );
+      setError(err.response?.data?.message || "Failed to load skills");
     } finally {
       setLoading(false);
     }
@@ -53,6 +48,29 @@ const SkillsSection = ({ portfolioId }) => {
     setTimeout(() => {
       setSuccess("");
     }, 2500);
+  };
+
+  const handleSuggestSkills = async () => {
+    const currentSkills = skills.map((skill) => skill.name).join(", ");
+
+    const content = currentSkills
+      ? `Current technical skills: ${currentSkills}`
+      : "The developer has not added any technical skills yet.";
+
+    try {
+      setSuggesting(true);
+      setError("");
+
+      const response = await portfolioService.suggestSkills({
+        content,
+      });
+
+      setAiSuggestion(response.data.content);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to suggest skills");
+    } finally {
+      setSuggesting(false);
+    }
   };
 
   const handleAdd = async (e) => {
@@ -79,10 +97,7 @@ const SkillsSection = ({ portfolioId }) => {
 
       showSuccess("Skill added successfully");
     } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          "Failed to add skill"
-      );
+      setError(err.response?.data?.message || "Failed to add skill");
     } finally {
       setAdding(false);
     }
@@ -117,24 +132,17 @@ const SkillsSection = ({ portfolioId }) => {
         {
           name: editingName.trim(),
           level: editingLevel,
-        }
+        },
       );
 
       setSkills((prev) =>
-        prev.map((skill) =>
-          skill._id === skillId
-            ? response.data
-            : skill
-        )
+        prev.map((skill) => (skill._id === skillId ? response.data : skill)),
       );
 
       cancelEditing();
       showSuccess("Skill updated successfully");
     } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          "Failed to update skill"
-      );
+      setError(err.response?.data?.message || "Failed to update skill");
     } finally {
       setSavingId(null);
     }
@@ -145,21 +153,13 @@ const SkillsSection = ({ portfolioId }) => {
       setDeletingId(skillId);
       setError("");
 
-      await portfolioService.deleteSkill(
-        portfolioId,
-        skillId
-      );
+      await portfolioService.deleteSkill(portfolioId, skillId);
 
-      setSkills((prev) =>
-        prev.filter((skill) => skill._id !== skillId)
-      );
+      setSkills((prev) => prev.filter((skill) => skill._id !== skillId));
 
       showSuccess("Skill removed");
     } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          "Failed to delete skill"
-      );
+      setError(err.response?.data?.message || "Failed to delete skill");
     } finally {
       setDeletingId(null);
     }
@@ -170,23 +170,28 @@ const SkillsSection = ({ portfolioId }) => {
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-ink">
-            Skills
-          </h2>
+          <h2 className="text-lg font-semibold text-ink">Skills</h2>
 
           <p className="mt-1 text-sm text-muted">
             Showcase your technical expertise.
           </p>
         </div>
 
+        <button
+          type="button"
+          onClick={handleSuggestSkills}
+          disabled={suggesting}
+          className="rounded-lg border border-accent/30 bg-emerald-50 px-3 py-2 text-xs font-medium text-accent transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {suggesting ? "Suggesting..." : "Suggest with AI"}
+        </button>
+
         {/* Visibility toggle */}
         <button
           type="button"
           onClick={() => setVisible(!visible)}
           className={`relative h-6 w-11 shrink-0 rounded-full transition ${
-            visible
-              ? "bg-accent"
-              : "bg-stone-300"
+            visible ? "bg-accent" : "bg-stone-300"
           }`}
           aria-label="Toggle skills visibility"
         >
@@ -226,9 +231,7 @@ const SkillsSection = ({ portfolioId }) => {
               </div>
             ) : skills.length === 0 ? (
               <div className="rounded-xl border border-dashed border-stone-300 px-5 py-8 text-center">
-                <p className="text-sm text-stone-600">
-                  No skills added yet.
-                </p>
+                <p className="text-sm text-stone-600">No skills added yet.</p>
 
                 <p className="mt-1 text-xs text-muted">
                   Add your first skill below.
@@ -246,24 +249,17 @@ const SkillsSection = ({ portfolioId }) => {
                       <div className="flex flex-col gap-3 sm:flex-row">
                         <input
                           value={editingName}
-                          onChange={(e) =>
-                            setEditingName(e.target.value)
-                          }
+                          onChange={(e) => setEditingName(e.target.value)}
                           className="min-w-0 flex-1 rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-ink outline-none transition focus:border-accent"
                         />
 
                         <select
                           value={editingLevel}
-                          onChange={(e) =>
-                            setEditingLevel(e.target.value)
-                          }
+                          onChange={(e) => setEditingLevel(e.target.value)}
                           className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700 outline-none focus:border-accent"
                         >
                           {skillLevels.map((item) => (
-                            <option
-                              key={item}
-                              value={item}
-                            >
+                            <option key={item} value={item}>
                               {item}
                             </option>
                           ))}
@@ -272,17 +268,11 @@ const SkillsSection = ({ portfolioId }) => {
                         <div className="flex gap-2">
                           <button
                             type="button"
-                            onClick={() =>
-                              handleUpdate(skill._id)
-                            }
-                            disabled={
-                              savingId === skill._id
-                            }
+                            onClick={() => handleUpdate(skill._id)}
+                            disabled={savingId === skill._id}
                             className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700 disabled:opacity-50"
                           >
-                            {savingId === skill._id
-                              ? "Saving..."
-                              : "Save"}
+                            {savingId === skill._id ? "Saving..." : "Save"}
                           </button>
 
                           <button
@@ -320,9 +310,7 @@ const SkillsSection = ({ portfolioId }) => {
                       <div className="flex items-center gap-3 opacity-100 sm:opacity-0 sm:transition sm:group-hover:opacity-100">
                         <button
                           type="button"
-                          onClick={() =>
-                            startEditing(skill)
-                          }
+                          onClick={() => startEditing(skill)}
                           className="text-xs text-muted transition hover:text-accent"
                         >
                           Edit
@@ -330,25 +318,71 @@ const SkillsSection = ({ portfolioId }) => {
 
                         <button
                           type="button"
-                          onClick={() =>
-                            handleDelete(skill._id)
-                          }
-                          disabled={
-                            deletingId === skill._id
-                          }
+                          onClick={() => handleDelete(skill._id)}
+                          disabled={deletingId === skill._id}
                           className="text-xs text-muted transition hover:text-red-600 disabled:opacity-50"
                         >
-                          {deletingId === skill._id
-                            ? "..."
-                            : "Remove"}
+                          {deletingId === skill._id ? "..." : "Remove"}
                         </button>
                       </div>
                     </div>
-                  )
+                  ),
                 )}
               </div>
             )}
           </div>
+
+          {aiSuggestion && (
+            <div className="mt-5 rounded-xl border border-stone-200 bg-stone-50 p-4">
+              <div>
+                <h3 className="text-sm font-semibold text-ink">
+                  AI Skill Suggestions
+                </h3>
+
+                <p className="mt-1 text-xs text-muted">
+                  Review the suggested skills before adding them.
+                </p>
+              </div>
+
+              <div className="mt-3 rounded-lg border border-stone-200 bg-white p-4">
+                <p className="whitespace-pre-wrap text-sm leading-6 text-stone-700">
+                  {aiSuggestion}
+                </p>
+              </div>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAiSuggestion("");
+                    toast.success(
+                      "Review the suggestions and add the relevant skills manually.",
+                    );
+                  }}
+                  className="rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-white transition hover:bg-emerald-700"
+                >
+                  Accept
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setAiSuggestion("")}
+                  className="rounded-lg border border-stone-200 px-4 py-2 text-xs text-stone-600 transition hover:text-ink"
+                >
+                  Reject
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleSuggestSkills}
+                  disabled={suggesting}
+                  className="rounded-lg border border-stone-200 px-4 py-2 text-xs text-stone-600 transition hover:text-ink disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {suggesting ? "Suggesting..." : "Regenerate"}
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Add skill */}
           <form

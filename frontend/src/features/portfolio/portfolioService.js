@@ -341,6 +341,34 @@ const getPublicPortfolio = async (slug) => {
   return response.data;
 };
 
+const generateAbout = async (data) => {
+  const response = await api.post("/ai/about", data);
+  return response.data;
+};
+
+const improveGrammar = async (data) => {
+  const response = await api.post("/ai/improve-grammar", data);
+  return response.data;
+};
+
+const improveProjectDescription = async (data) => {
+  const response = await api.post(
+    "/ai/project-description",
+    data
+  );
+
+  return response.data;
+};
+
+const suggestSkills = async (data) => {
+  const response = await api.post(
+    "/ai/suggest-skills",
+    data
+  );
+
+  return response.data;
+};
+
 export default {
   createPortfolio,
   getPortfolios,
@@ -377,5 +405,10 @@ export default {
   deleteExperience,
   uploadProjectImage,
   getPublicPortfolio,
+
+  generateAbout,
+  improveGrammar,
+  improveProjectDescription,
+  suggestSkills,
 
 };
