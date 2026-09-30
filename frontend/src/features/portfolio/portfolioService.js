@@ -369,6 +369,14 @@ const suggestSkills = async (data) => {
   return response.data;
 };
 
+const reviewPortfolio = async (portfolioId) => {
+  const response = await api.post("/ai/review", {
+    portfolioId,
+  });
+
+  return response.data;
+};
+
 export default {
   createPortfolio,
   getPortfolios,
@@ -410,5 +418,6 @@ export default {
   improveGrammar,
   improveProjectDescription,
   suggestSkills,
+  reviewPortfolio,
 
 };

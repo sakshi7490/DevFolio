@@ -58,9 +58,32 @@ Requirements:
 - Return only the improved content.
 `;
 
+
+const portfolioReviewPrompt = (portfolio) => `
+You are a professional portfolio reviewer.
+
+Review the following developer portfolio information:
+
+${JSON.stringify(portfolio, null, 2)}
+
+Identify areas where the portfolio content can be improved.
+
+Requirements:
+- Give practical and specific suggestions.
+- Focus on clarity, professionalism, completeness, and content quality.
+- Do not invent information.
+- Do not rewrite the entire portfolio.
+- Mention only improvements that are relevant to the provided information.
+- Keep the suggestions concise.
+- Return a numbered list of improvement suggestions only.
+- Do not use Markdown formatting such as **, *, #, -, or backticks.
+`;
+
+
 export default {
   aboutPrompt,
   improveProjectPrompt,
   suggestSkillsPrompt,
   improveGrammarPrompt,
+  portfolioReviewPrompt,
 };
