@@ -107,6 +107,49 @@ const getPublicPortfolio = async (slug) => {
   };
 };
 
+const getPortfolioForReview = async (portfolioId, userId) => {
+  const portfolio = await Portfolio.findOne({
+    _id: portfolioId,
+    userId,
+  });
+
+  if (!portfolio) {
+    throw new ApiError(404, "Portfolio not found");
+  }
+
+  const [
+    personal,
+    about,
+    social,
+    skills,
+    education,
+    certifications,
+    projects,
+    experience,
+  ] = await Promise.all([
+    Personal.findOne({ portfolioId }),
+    About.findOne({ portfolioId }),
+    Social.findOne({ portfolioId }),
+    Skill.find({ portfolioId }),
+    Education.find({ portfolioId }),
+    Certification.find({ portfolioId }),
+    Project.find({ portfolioId }),
+    Experience.find({ portfolioId }),
+  ]);
+
+  return {
+    portfolio,
+    personal,
+    about,
+    social,
+    skills,
+    education,
+    certifications,
+    projects,
+    experience,
+  };
+};
+
 const getPublicResume = async (slug) => {
   const portfolio = await Portfolio.findOne({
     slug,
@@ -181,4 +224,5 @@ export default {
   getPublicResume,
   deletePortfolio,
   updatePortfolioSettings,
+  getPortfolioForReview,
 };
