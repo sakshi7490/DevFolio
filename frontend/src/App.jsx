@@ -14,6 +14,7 @@ import PortfolioEditor from "./features/portfolio/pages/PortfolioEditor";
 import AppLayout from "./components/layout/AppLayout";
 import PublicPortfolio from "./features/portfolio/pages/PublicPortfolio";
 import PortfolioReview from "./features/portfolio/pages/PortfolioReview";
+import ResumeImport from "./features/portfolio/pages/ResumeImport";
 
 function App() {
   return (
@@ -51,6 +52,11 @@ function App() {
           <Route
             path="/dashboard/portfolios/:id/review"
             element={<PortfolioReview />}
+          />
+
+          <Route
+            path="/dashboard/portfolios/:id/resume-import"
+            element={<ResumeImport />}
           />
         </Route>
       </Route>

@@ -13,6 +13,7 @@ import projectRoutes from "../modules/portfolio/project.routes.js";
 import experienceRoutes from "../modules/portfolio/experience.routes.js";
 import aiRoutes from "../modules/ai/ai.routes.js";
 import reviewRoutes from "../modules/ai/review.routes.js";
+import resumeRoutes from "../modules/resume/resume.routes.js";
 
 const router = Router();
 
@@ -46,5 +47,8 @@ router.use("/portfolios", experienceRoutes);
 //ai route
 router.use("/ai", aiRoutes);
 router.use("/ai/review", reviewRoutes);
+
+//resume route
+router.use("/resume", resumeRoutes);
 
 export default router;
