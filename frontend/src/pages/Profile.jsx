@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Mail, User, Image as ImageIcon } from "lucide-react";
 import useAuth from "../hooks/useAuth";
 import { getProfile, updateProfile } from "../services/user.service";
 import Input from "../components/common/Input";
@@ -29,11 +30,11 @@ const Profile = () => {
       try {
         setLoading(true);
         const response = await getProfile();
-        const user = response.data;
+        const user = response.data.user;
         setProfile(user);
         setFormData({
           name: user.name || "",
-          githubUsername: user.githubUsername || "",
+          githubUsername: user.socialLinks?.github || "",
           profileImage: user.profileImage || "",
         });
       } catch (err) {
@@ -62,13 +63,26 @@ const Profile = () => {
       setError("");
       setSuccess("");
 
-      const response = await updateProfile(formData);
-      setProfile(response.data);
-      updateUser(response.data);
+      const payload = {
+        name: formData.name,
+        profileImage: formData.profileImage,
+        socialLinks: {
+          ...(profile?.socialLinks || {}),
+          github: formData.githubUsername,
+        },
+      };
+
+      const response = await updateProfile(payload);
+
+      const updatedUser = response.data.user;
+
+      setProfile(updatedUser);
+      updateUser(updatedUser);
+
       setFormData({
-        name: response.data.name || "",
-        githubUsername: response.data.githubUsername || "",
-        profileImage: response.data.profileImage || "",
+        name: updatedUser.name || "",
+        githubUsername: updatedUser.socialLinks?.github || "",
+        profileImage: updatedUser.profileImage || "",
       });
       setSuccess("Profile updated successfully!");
     } catch (err) {
@@ -87,73 +101,150 @@ const Profile = () => {
   }
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="mx-auto max-w-4xl">
       <PageHeader
         eyebrow="Account"
         title="My profile"
-        description="View and update your profile information."
+        description="Manage your personal information and profile details."
       />
 
-      <div className={cardClass}>
-        <div className="mb-8 flex items-center gap-5">
-          <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-navy text-2xl font-bold text-white">
-            {formData.profileImage ? (
-              <img
-                src={formData.profileImage}
-                alt="Profile"
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              formData.name?.charAt(0)?.toUpperCase() || "U"
-            )}
-          </div>
-          <div>
-            <h2 className="text-xl font-semibold text-ink">
-              {profile?.name || "User"}
-            </h2>
-            <p className="text-sm text-muted">{profile?.email}</p>
+      <div className={`${cardClass} overflow-hidden p-0`}>
+        {/* Profile hero */}
+        <div className="relative border-b border-stone-200 bg-gradient-to-br from-emerald-50 via-white to-stone-50 px-6 py-7 sm:px-8">
+          <div className="absolute right-0 top-0 h-32 w-32 rounded-full bg-emerald-100/40 blur-3xl" />
+
+          <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center">
+            <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl border-4 border-white bg-navy text-3xl font-bold text-white shadow-md">
+              {formData.profileImage ? (
+                <img
+                  src={formData.profileImage}
+                  alt="Profile"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                formData.name?.charAt(0)?.toUpperCase() || "U"
+              )}
+            </div>
+
+            <div className="min-w-0">
+              <p className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+                Profile
+              </p>
+
+              <h2 className="truncate text-2xl font-semibold text-ink">
+                {profile?.name || "User"}
+              </h2>
+
+              <div className="mt-2 flex items-center gap-2 text-sm text-muted">
+                <Mail className="h-4 w-4" />
+                <span className="truncate">{profile?.email}</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <Input
-            label="Full name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            placeholder="Enter your name"
-          />
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="p-6 sm:p-8">
+          {/* Personal information */}
+          <div className="mb-8">
+            <div className="mb-5 flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 text-accent">
+                <User className="h-4 w-4" />
+              </div>
 
-          <Input
-            label="Email"
-            type="email"
-            name="email"
-            value={profile?.email || ""}
-            onChange={() => {}}
-            disabled
-          />
-          <p className="-mt-3 text-xs text-muted">Email cannot be changed.</p>
+              <div>
+                <h3 className="text-sm font-semibold text-ink">
+                  Personal information
+                </h3>
+                <p className="mt-0.5 text-xs text-muted">
+                  Basic information associated with your account.
+                </p>
+              </div>
+            </div>
 
-          <Input
-            label="GitHub username"
-            name="githubUsername"
-            value={formData.githubUsername}
-            onChange={handleChange}
-            placeholder="e.g. your-handle"
-          />
+            <div className="space-y-5">
+              <Input
+                label="Full name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Enter your name"
+              />
 
-          <Input
-            label="Profile image URL"
-            name="profileImage"
-            value={formData.profileImage}
-            onChange={handleChange}
-            placeholder="https://example.com/profile.jpg"
-          />
+              <div>
+                <Input
+                  label="Email"
+                  type="email"
+                  name="email"
+                  value={profile?.email || ""}
+                  onChange={() => {}}
+                  disabled
+                />
+                <p className="mt-2 text-xs text-muted">
+                  Your email address cannot be changed.
+                </p>
+              </div>
+            </div>
+          </div>
 
-          {error && <Alert type="error">{error}</Alert>}
-          {success && <Alert type="success">{success}</Alert>}
+          {/* Profile details */}
+          <div className="border-t border-stone-200 pt-8">
+            <div className="mb-5 flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 text-accent">
+                <span className="text-sm font-bold">GH</span>
+              </div>
 
-          <div className="flex flex-wrap gap-3 pt-2">
+              <div>
+                <h3 className="text-sm font-semibold text-ink">
+                  Profile details
+                </h3>
+                <p className="mt-0.5 text-xs text-muted">
+                  Add information that can be displayed on your portfolio.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-5">
+              <Input
+                label="GitHub profile URL"
+                name="githubUsername"
+                value={formData.githubUsername}
+                onChange={handleChange}
+                placeholder="https://github.com/your-username"
+              />
+
+              <div>
+                <div className="mb-2 flex items-center gap-2">
+                  <ImageIcon className="h-4 w-4 text-muted" />
+                  <span className="text-sm font-medium text-ink">
+                    Profile image URL
+                  </span>
+                </div>
+
+                <Input
+                  name="profileImage"
+                  value={formData.profileImage}
+                  onChange={handleChange}
+                  placeholder="https://example.com/profile.jpg"
+                />
+
+                <p className="mt-2 text-xs text-muted">
+                  Use a publicly accessible image URL for your profile photo.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Feedback */}
+          {(error || success) && (
+            <div className="mt-7">
+              {error && <Alert type="error">{error}</Alert>}
+              {success && <Alert type="success">{success}</Alert>}
+            </div>
+          )}
+
+          {/* Actions */}
+          <div className="mt-8 flex flex-col-reverse gap-3 border-t border-stone-200 pt-6 sm:flex-row sm:justify-end">
             <Button
               type="button"
               variant="secondary"
@@ -161,6 +252,7 @@ const Profile = () => {
             >
               Cancel
             </Button>
+
             <Button type="submit" loading={saving} loadingText="Saving...">
               Save changes
             </Button>

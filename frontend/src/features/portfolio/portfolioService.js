@@ -377,6 +377,22 @@ const reviewPortfolio = async (portfolioId) => {
   return response.data;
 };
 
+
+const uploadResume = async (formData) => {
+  const response = await api.post("/resume/upload", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return response.data;
+};
+
+const importResumeData = async (data) => {
+  const response = await api.post("/resume/import", data);
+  return response.data;
+};
+
 export default {
   createPortfolio,
   getPortfolios,
@@ -419,5 +435,7 @@ export default {
   improveProjectDescription,
   suggestSkills,
   reviewPortfolio,
+  uploadResume,
+  importResumeData,
 
 };

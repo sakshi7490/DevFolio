@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import {  useNavigate, useParams, useSearchParams, Link } from "react-router-dom";
+import {
+  useNavigate,
+  useParams,
+  useSearchParams,
+  Link,
+} from "react-router-dom";
 
 import {
   User,
@@ -71,9 +76,9 @@ const PortfolioEditor = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
 
-const [activeSection, setActiveSection] = useState(
-  searchParams.get("section") || "personal",
-);
+  const [activeSection, setActiveSection] = useState(
+    searchParams.get("section") || "personal",
+  );
   const [isDirty, setIsDirty] = useState(false);
   const [pendingSection, setPendingSection] = useState(null);
   const [completedSections, setCompletedSections] = useState({});
@@ -178,7 +183,7 @@ const [activeSection, setActiveSection] = useState(
 
   return (
     <div className="mx-auto max-w-7xl">
-      <div className="mb-8 flex flex-col justify-between gap-4 border-b border-stone-200 pb-6 sm:flex-row sm:items-center">
+      <div className="mb-8 flex flex-col items-start justify-between gap-6 border-b border-stone-200 pb-6 sm:flex-row sm:items-center">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-accent">
             Editor
@@ -193,14 +198,26 @@ const [activeSection, setActiveSection] = useState(
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => navigate(`/dashboard/portfolios/${id}/review`)}
-          className="inline-flex items-center justify-center gap-2 rounded-lg border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
-        >
-          <ClipboardCheck className="h-4 w-4" />
-          Review Portfolio
-        </button>
+        <div className="flex shrink-0 items-center gap-3">
+          <button
+            type="button"
+            onClick={() =>
+              navigate(`/dashboard/portfolios/${id}/resume-import`)
+            }
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
+          >
+            <FileText className="h-4 w-4" />
+            Import Resume
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate(`/dashboard/portfolios/${id}/review`)}
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
+          >
+            <ClipboardCheck className="h-4 w-4" />
+            Review Portfolio
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[240px_minmax(0,1fr)]">
