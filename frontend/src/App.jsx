@@ -15,6 +15,7 @@ import AppLayout from "./components/layout/AppLayout";
 import PublicPortfolio from "./features/portfolio/pages/PublicPortfolio";
 import PortfolioReview from "./features/portfolio/pages/PortfolioReview";
 import ResumeImport from "./features/portfolio/pages/ResumeImport";
+import GithubImport from "./features/portfolio/pages/GithubImport";
 
 function App() {
   return (
@@ -57,6 +58,10 @@ function App() {
           <Route
             path="/dashboard/portfolios/:id/resume-import"
             element={<ResumeImport />}
+          />
+          <Route
+            path="/dashboard/portfolios/:id/github-import"
+            element={<GithubImport />}
           />
         </Route>
       </Route>

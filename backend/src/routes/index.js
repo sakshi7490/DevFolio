@@ -14,6 +14,7 @@ import experienceRoutes from "../modules/portfolio/experience.routes.js";
 import aiRoutes from "../modules/ai/ai.routes.js";
 import reviewRoutes from "../modules/ai/review.routes.js";
 import resumeRoutes from "../modules/resume/resume.routes.js";
+import githubRoutes from "../modules/github/github.routes.js";
 
 const router = Router();
 
@@ -50,5 +51,8 @@ router.use("/ai/review", reviewRoutes);
 
 //resume route
 router.use("/resume", resumeRoutes);
+
+//github route
+router.use("/github", githubRoutes);
 
 export default router;
