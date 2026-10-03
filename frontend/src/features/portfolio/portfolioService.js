@@ -393,6 +393,23 @@ const importResumeData = async (data) => {
   return response.data;
 };
 
+const connectGithub = async (username) => {
+  const response = await api.post("/github/connect", {
+    username,
+  });
+
+  return response.data;
+};
+
+const importGithubRepositories = async (portfolioId, repositories) => {
+  const response = await api.post("/github/import", {
+    portfolioId,
+    repositories,
+  });
+
+  return response.data;
+};
+
 export default {
   createPortfolio,
   getPortfolios,
@@ -437,5 +454,7 @@ export default {
   reviewPortfolio,
   uploadResume,
   importResumeData,
+  connectGithub,
+  importGithubRepositories,
 
 };

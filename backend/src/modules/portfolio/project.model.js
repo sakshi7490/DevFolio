@@ -16,6 +16,11 @@ const projectSchema = new mongoose.Schema(
       maxlength: 200,
     },
 
+    githubId: {
+  type: Number,
+  default: null,
+},
+
     description: {
       type: String,
       trim: true,
