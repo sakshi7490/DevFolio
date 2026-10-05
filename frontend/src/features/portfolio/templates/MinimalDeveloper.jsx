@@ -1,382 +1,448 @@
-import React from "react";
+import {
+  collectSocialLinks,
+  fontClasses,
+  formatDate,
+  formatDateRange,
+} from "./templateHelpers";
 
-const MinimalDeveloper = ({ data = {} }) => {
-  const {
-    portfolio = {},
-    personal = {},
-    about = {},
-    social = {},
-    skills = [],
-    education = [],
-    certifications = [],
-    projects = [],
-    experience = [],
-  } = data;
-
-
-
-  const fontClasses = {
-  inter: "font-sans",
-  poppins: "font-display",
-  serif: "font-serif",
-  mono: "font-mono",
+const themeColors = {
+  orange: {
+    accent: "text-orange-700",
+    accentHover: "hover:text-orange-800",
+    focus: "focus-visible:outline-orange-700",
+  },
+  blue: {
+    accent: "text-blue-700",
+    accentHover: "hover:text-blue-800",
+    focus: "focus-visible:outline-blue-700",
+  },
+  green: {
+    accent: "text-emerald-700",
+    accentHover: "hover:text-emerald-800",
+    focus: "focus-visible:outline-emerald-700",
+  },
+  purple: {
+    accent: "text-violet-700",
+    accentHover: "hover:text-violet-800",
+    focus: "focus-visible:outline-violet-700",
+  },
+  red: {
+    accent: "text-red-700",
+    accentHover: "hover:text-red-800",
+    focus: "focus-visible:outline-red-700",
+  },
 };
 
-const fontClass = fontClasses[data.portfolio.font || "inter"];
+const MinimalDeveloper = ({ data = {} }) => {
+  const portfolio = data.portfolio || {};
+  const personal = data.personal || {};
+  const about = data.about || {};
+  const social = data.social || {};
+  const skills = data.skills || [];
+  const education = data.education || [];
+  const certifications = data.certifications || [];
+  const projects = data.projects || [];
+  const experience = data.experience || [];
 
-  const themeColors = {
-    orange: {
-      accent: "text-orange-600",
-      accentHover: "hover:text-orange-700",
-      borderAccent: "hover:border-orange-300",
-      soft: "bg-orange-50 text-orange-700",
-    },
-    blue: {
-      accent: "text-blue-600",
-      accentHover: "hover:text-blue-700",
-      borderAccent: "hover:border-blue-300",
-      soft: "bg-blue-50 text-blue-700",
-    },
-    green: {
-      accent: "text-green-600",
-      accentHover: "hover:text-green-700",
-      borderAccent: "hover:border-green-300",
-      soft: "bg-green-50 text-green-700",
-    },
-    purple: {
-      accent: "text-purple-600",
-      accentHover: "hover:text-purple-700",
-      borderAccent: "hover:border-purple-300",
-      soft: "bg-purple-50 text-purple-700",
-    },
-    red: {
-      accent: "text-red-600",
-      accentHover: "hover:text-red-700",
-      borderAccent: "hover:border-red-300",
-      soft: "bg-red-50 text-red-700",
-    },
-  };
-
+  const fontClass = fontClasses[portfolio.font || "inter"];
   const theme = themeColors[portfolio.themeColor || "orange"];
   const isDark = (portfolio.themeMode || "dark") === "dark";
+  const socialLinks = collectSocialLinks(social);
+  const displayName = personal.name || portfolio.title || "Developer Portfolio";
 
   const mode = isDark
     ? {
-        page: "bg-stone-950 text-stone-100",
-        header: "bg-stone-950/90 border-stone-800",
-        heading: "text-stone-100",
+        page: "bg-[#111110] text-stone-200",
+        heading: "text-stone-50",
         text: "text-stone-300",
-        muted: "text-stone-400",
-        border: "border-stone-800",
-        card: "bg-stone-900 border-stone-800",
-        softCard: "bg-stone-900/60",
-        image: "bg-stone-800",
-        footer: "bg-stone-950",
-        button: "bg-stone-100 text-stone-900 hover:bg-white",
-        outline: "border-stone-700 bg-stone-900 text-stone-200 hover:bg-stone-800",
-        tech: "bg-stone-800 text-stone-300",
+        muted: "text-stone-500",
+        hairline: "border-stone-800",
+        button: "bg-stone-50 text-stone-950 hover:bg-white",
+        ghost: "text-stone-300 hover:text-stone-50",
       }
     : {
-        page: "bg-[#fafaf9] text-stone-900",
-        header: "bg-white/80 border-stone-200/80",
-        heading: "text-stone-900",
-        text: "text-stone-700",
-        muted: "text-stone-500",
-        border: "border-stone-200/80",
-        card: "bg-white border-stone-200/90",
-        softCard: "bg-stone-50",
-        image: "bg-stone-100",
-        footer: "bg-white",
-        button: "bg-stone-900 text-white hover:bg-stone-800",
-        outline: "border-stone-300 bg-white text-stone-700 hover:bg-stone-50 hover:border-stone-400",
-        tech: "bg-stone-100 text-stone-600",
+        page: "bg-[#fbfaf7] text-stone-800",
+        heading: "text-stone-950",
+        text: "text-stone-600",
+        muted: "text-stone-400",
+        hairline: "border-stone-200",
+        button: "bg-stone-950 text-white hover:bg-stone-800",
+        ghost: "text-stone-600 hover:text-stone-950",
       };
 
+  const linkClass = `underline decoration-transparent underline-offset-[5px] transition ${theme.accent} hover:decoration-current ${theme.accentHover} focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`;
 
-  return (
-    <div className={`min-h-screen ${fontClass} ${mode.page} antialiased`}>
-      {/* Hero Section */}
-      <header className={`border-b ${mode.header} backdrop-blur-sm sticky top-0 z-10 sm:relative`}>
-        <div className="mx-auto max-w-5xl px-6 py-16 sm:py-24 lg:px-8">
-          <div className="flex flex-col-reverse gap-8 md:flex-row md:items-center md:justify-between">
-            <div className="max-w-2xl">
-              <p className={`text-xs font-semibold uppercase tracking-[0.2em] ${mode.muted}`}>
-                {personal?.headline || "Software Developer"}
-              </p>
+ return (
+  <div className={`min-h-screen ${fontClass} ${mode.page} antialiased`}>
+    <a
+      href="#content"
+      className="sr-only focus:not-sr-only focus:absolute focus:left-6 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-3 focus:py-2 focus:text-stone-900"
+    >
+      Skip to content
+    </a>
 
-              <h1 className={`mt-3 text-4xl font-semibold tracking-tight ${mode.heading} sm:text-6xl`}>
-                {personal?.name || portfolio?.title || "Developer Portfolio"}
-              </h1>
+    {/* HERO */}
+    <header className={`relative overflow-hidden border-b ${mode.hairline}`}>
+      <div
+        className={`pointer-events-none absolute -right-32 -top-32 h-80 w-80 rounded-full blur-3xl ${
+          isDark ? "bg-white/[0.03]" : "bg-stone-200/60"
+        }`}
+      />
 
-              {personal?.location && (
-                <p className={`mt-3 flex items-center gap-1.5 text-sm font-medium ${mode.muted}`}>
-                  <svg className={`w-4 h-4 ${mode.muted}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  {personal.location}
-                </p>
+      <div
+        className={`pointer-events-none absolute -bottom-40 -left-32 h-80 w-80 rounded-full blur-3xl ${
+          isDark ? "bg-white/[0.02]" : "bg-stone-100"
+        }`}
+      />
+
+      <div className="relative mx-auto max-w-4xl px-6 pb-20 pt-16 sm:px-8 sm:pb-28 sm:pt-24">
+        <div className="max-w-3xl">
+          {personal.profileImage && (
+            <div className="mb-8">
+              <img
+                src={personal.profileImage}
+                alt={personal.name || "Profile"}
+                className={`h-20 w-20 rounded-2xl object-cover ring-1 ${mode.hairline} sm:h-24 sm:w-24`}
+              />
+            </div>
+          )}
+
+          <div className="flex items-center gap-3">
+            <span className={`h-1.5 w-1.5 rounded-full ${theme.accent.replace("text-", "bg-")}`} />
+            <p
+              className={`text-[11px] font-semibold uppercase tracking-[0.28em] ${mode.muted}`}
+            >
+              {personal.headline || "Software Developer"}
+            </p>
+          </div>
+
+          <h1
+            className={`mt-5 max-w-3xl text-5xl font-medium leading-[1.02] tracking-[-0.055em] ${mode.heading} sm:text-7xl`}
+          >
+            {displayName}
+          </h1>
+
+          {personal.location && (
+            <p className={`mt-6 text-sm ${mode.muted}`}>
+              Based in {personal.location}
+            </p>
+          )}
+
+          {(portfolio.resumeUrl || socialLinks.length > 0) && (
+            <nav
+              aria-label="Profile links"
+              className="mt-9 flex flex-wrap items-center gap-3"
+            >
+              {portfolio.resumeUrl && (
+                <a
+                  href={portfolio.resumeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`inline-flex items-center rounded-full px-5 py-2.5 text-sm font-medium shadow-sm transition ${mode.button} focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
+                >
+                  View Resume
+                </a>
               )}
 
-              {/* Action Buttons & Links */}
-              <div className="mt-8 flex flex-wrap items-center gap-3">
-                {portfolio?.resumeUrl && (
-                  <a
-                    href={portfolio.resumeUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`inline-flex items-center justify-center rounded-lg ${mode.button} px-5 py-2.5 text-sm font-medium shadow-sm transition active:scale-[0.98]`}
-                  >
-                    View Resume
-                  </a>
-                )}
-
-                {social?.github && (
-                  <a
-                    href={social.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`inline-flex items-center justify-center rounded-lg border ${mode.outline} px-4 py-2.5 text-sm font-medium shadow-sm transition`}
-                  >
-                    GitHub
-                  </a>
-                )}
-
-                {social?.linkedin && (
-                  <a
-                    href={social.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`inline-flex items-center justify-center rounded-lg border ${mode.outline} px-4 py-2.5 text-sm font-medium shadow-sm transition`}
-                  >
-                    LinkedIn
-                  </a>
-                )}
-              </div>
-            </div>
-
-            {/* Profile Avatar */}
-            {personal?.profileImage && (
-              <div className="relative shrink-0">
-                <img
-                  src={personal.profileImage}
-                  alt={personal.name || "Profile"}
-                  className={`h-32 w-32 rounded-2xl object-cover ring-1 ${mode.border} shadow-sm sm:h-40 sm:w-40`}
-                />
-              </div>
-            )}
-          </div>
+              {socialLinks.map((link) => (
+                <a
+                  key={link.key}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`rounded-full border ${mode.hairline} px-4 py-2.5 text-sm ${mode.ghost} transition hover:border-current focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
+                >
+                  {link.label}
+                </a>
+              ))}
+            </nav>
+          )}
         </div>
-      </header>
+      </div>
+    </header>
 
-      <main className="mx-auto max-w-5xl px-6 py-12 sm:py-16 lg:px-8 space-y-16">
-        {/* About Section */}
-        {(about?.content || portfolio?.description) && (
-          <section className={`border-b ${mode.border} pb-12`}>
-            <h2 className={`text-xs font-semibold uppercase tracking-[0.2em] ${mode.muted}`}>
+    <main
+      id="content"
+      className="mx-auto max-w-4xl px-6 sm:px-8"
+    >
+      {/* ABOUT */}
+      {(about.content || portfolio.description) && (
+        <section className={`border-b ${mode.hairline} py-16 sm:py-24`}>
+          <div className="grid gap-8 sm:grid-cols-[10rem_1fr] sm:gap-12">
+            <h2
+              className={`text-[11px] font-semibold uppercase tracking-[0.28em] ${mode.muted}`}
+            >
               About
             </h2>
-            <p className={`mt-4 max-w-3xl text-lg leading-relaxed ${mode.text} font-normal`}>
-              {about?.content || portfolio?.description}
-            </p>
-          </section>
-        )}
 
-        {/* Skills Section */}
-        {skills?.length > 0 && (
-          <section className={`border-b ${mode.border} pb-12`}>
-            <h2 className={`text-xs font-semibold uppercase tracking-[0.2em] ${mode.muted}`}>
-              Skills & Expertise
+            <p
+              className={`max-w-2xl text-xl leading-[1.75] ${mode.text} sm:text-2xl`}
+            >
+              {about.content || portfolio.description}
+            </p>
+          </div>
+        </section>
+      )}
+
+      {/* SKILLS */}
+      {skills.length > 0 && (
+        <section className={`border-b ${mode.hairline} py-16 sm:py-24`}>
+          <div className="grid gap-8 sm:grid-cols-[10rem_1fr] sm:gap-12">
+            <h2
+              className={`text-[11px] font-semibold uppercase tracking-[0.28em] ${mode.muted}`}
+            >
+              Skills
             </h2>
-            <div className="mt-6 flex flex-wrap gap-2">
+
+            <div className="flex flex-wrap gap-2.5">
               {skills.map((skill, index) => (
                 <span
                   key={skill._id || skill.name || index}
-                  className={`inline-flex items-center rounded-md border ${mode.card} px-3.5 py-1.5 text-sm font-medium ${mode.text} shadow-2xs transition ${theme.borderAccent}`}
+                  className={`rounded-full border ${mode.hairline} px-4 py-2 text-sm ${mode.text} transition hover:border-current`}
                 >
                   {skill.name || skill}
                 </span>
               ))}
             </div>
-          </section>
-        )}
+          </div>
+        </section>
+      )}
 
-        {/* Work Experience Section */}
-        {experience?.length > 0 && (
-          <section className={`border-b ${mode.border} pb-12`}>
-            <h2 className={`text-xs font-semibold uppercase tracking-[0.2em] ${mode.muted}`}>
-              Work Experience
+      {/* EXPERIENCE */}
+      {experience.length > 0 && (
+        <section className={`border-b ${mode.hairline} py-16 sm:py-24`}>
+          <div className="grid gap-10 sm:grid-cols-[10rem_1fr] sm:gap-12">
+            <h2
+              className={`text-[11px] font-semibold uppercase tracking-[0.28em] ${mode.muted}`}
+            >
+              Experience
             </h2>
-            <div className="mt-8 space-y-10">
+
+            <div className="space-y-12">
               {experience.map((item, index) => (
-                <article key={item._id || index} className="group relative">
-                  <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between">
-                    <h3 className={`text-xl font-semibold ${mode.heading}`}>
-                      {item.position}
-                    </h3>
-                    {(item.startDate || item.endDate) && (
-                      <span className={`text-xs font-medium ${mode.muted} sm:text-right`}>
-                        {item.startDate} {item.endDate ? `— ${item.endDate}` : "— Present"}
-                      </span>
-                    )}
-                  </div>
+                <article
+                  key={item._id || index}
+                  className="relative pl-6"
+                >
+                  <span
+                    className={`absolute left-0 top-2 h-2 w-2 rounded-full ${theme.accent.replace(
+                      "text-",
+                      "bg-",
+                    )}`}
+                  />
 
-                  <p className={`mt-1 text-sm font-medium ${mode.text}`}>
-                    {item.company}
-                    {item.location && <span className={mode.muted}> · {item.location}</span>}
-                  </p>
-
-                  {item.description && (
-                    <p className={`mt-3 max-w-3xl text-sm leading-relaxed ${mode.text}`}>
-                      {item.description}
+                  <div className="grid gap-2 sm:grid-cols-[8rem_1fr] sm:gap-8">
+                    <p
+                      className={`pt-1 text-xs tracking-wide ${mode.muted}`}
+                    >
+                      {formatDateRange(item.startDate, item.endDate, {
+                        presentIfOpen: true,
+                      })}
                     </p>
-                  )}
+
+                    <div>
+                      <h3
+                        className={`text-lg font-medium tracking-tight ${mode.heading}`}
+                      >
+                        {item.position}
+                      </h3>
+
+                      <p className={`mt-1 text-sm ${mode.text}`}>
+                        {item.company}
+                        {item.location && (
+                          <span className={mode.muted}>
+                            {" "}
+                            · {item.location}
+                          </span>
+                        )}
+                      </p>
+
+                      {item.description && (
+                        <p
+                          className={`mt-4 max-w-xl text-sm leading-7 ${mode.text}`}
+                        >
+                          {item.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 </article>
               ))}
             </div>
-          </section>
-        )}
+          </div>
+        </section>
+      )}
 
-        {/* Selected Projects Section */}
-        {projects?.length > 0 && (
-          <section className={`border-b ${mode.border} pb-12`}>
-            <h2 className={`text-xs font-semibold uppercase tracking-[0.2em] ${mode.muted}`}>
-              Selected Projects
+      {/* PROJECTS */}
+      {projects.length > 0 && (
+        <section className={`border-b ${mode.hairline} py-16 sm:py-24`}>
+          <div className="grid gap-10 sm:grid-cols-[10rem_1fr] sm:gap-12">
+            <h2
+              className={`text-[11px] font-semibold uppercase tracking-[0.28em] ${mode.muted}`}
+            >
+              Selected Work
             </h2>
 
-            <div className="mt-8 grid gap-6 sm:grid-cols-2">
+            <div className="grid gap-6">
               {projects.map((project, index) => (
                 <article
                   key={project._id || index}
-                  className={`group flex flex-col overflow-hidden rounded-xl border ${mode.card} transition ${theme.borderAccent} hover:shadow-sm`}
+                  className={`overflow-hidden rounded-2xl border ${mode.hairline} transition hover:-translate-y-0.5`}
                 >
                   {project.image && (
-                    <div className={`overflow-hidden border-b ${mode.border} ${mode.image}`}>
-                      <img
-                        src={project.image}
-                        alt={project.title}
-                        className="h-48 w-full object-cover transition duration-300 group-hover:scale-[1.02]"
-                      />
-                    </div>
+                    <img
+                      src={project.image}
+                      alt={project.title}
+                      className="aspect-[16/8] w-full object-cover"
+                    />
                   )}
 
-                  <div className="flex flex-1 flex-col justify-between p-6">
-                    <div>
-                      <h3 className={`text-lg font-semibold ${mode.heading}`}>
-                        {project.title}
-                      </h3>
+                  <div className="p-6 sm:p-7">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <h3
+                          className={`text-xl font-medium tracking-tight ${mode.heading}`}
+                        >
+                          {project.title}
+                        </h3>
 
-                      {project.description && (
-                        <p className={`mt-2 text-sm leading-relaxed ${mode.text} line-clamp-3`}>
-                          {project.description}
-                        </p>
-                      )}
+                        {project.description && (
+                          <p
+                            className={`mt-3 max-w-2xl text-sm leading-7 ${mode.text}`}
+                          >
+                            {project.description}
+                          </p>
+                        )}
+                      </div>
 
                       {project.technologies?.length > 0 && (
-                        <div className="mt-4 flex flex-wrap gap-1.5">
-                          {project.technologies.map((tech, techIndex) => (
+                        <div className="flex flex-wrap gap-1.5 sm:max-w-xs sm:justify-end">
+                          {project.technologies.map((technology) => (
                             <span
-                              key={`${tech}-${techIndex}`}
-                              className={`rounded px-2 py-0.5 text-xs font-medium ${mode.tech}`}
+                              key={technology}
+                              className={`rounded-full border ${mode.hairline} px-2.5 py-1 text-[11px] ${mode.muted}`}
                             >
-                              {tech}
+                              {technology}
                             </span>
                           ))}
                         </div>
                       )}
                     </div>
 
-                    <div className={`mt-6 flex items-center gap-4 border-t ${mode.border} pt-2 text-xs font-medium`}>
-                      {project.projectUrl && (
-                        <a
-                          href={project.projectUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={`inline-flex items-center gap-1 ${theme.accent} underline underline-offset-4 ${theme.accentHover}`}
-                        >
-                          Live Demo ↗
-                        </a>
-                      )}
+                    {(project.projectUrl || project.githubUrl) && (
+                      <div className="mt-6 flex flex-wrap gap-5 text-sm">
+                        {project.projectUrl && (
+                          <a
+                            href={project.projectUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={linkClass}
+                          >
+                            Live demo →
+                          </a>
+                        )}
 
-                      {project.githubUrl && (
-                        <a
-                          href={project.githubUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={`inline-flex items-center gap-1 ${mode.text} underline underline-offset-4 ${theme.accentHover}`}
-                        >
-                          Source Code
-                        </a>
-                      )}
-                    </div>
+                        {project.githubUrl && (
+                          <a
+                            href={project.githubUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={linkClass}
+                          >
+                            GitHub →
+                          </a>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </article>
               ))}
             </div>
-          </section>
-        )}
+          </div>
+        </section>
+      )}
 
-        {/* Education Section */}
-        {education?.length > 0 && (
-          <section className={`border-b ${mode.border} pb-12`}>
-            <h2 className={`text-xs font-semibold uppercase tracking-[0.2em] ${mode.muted}`}>
+      {/* EDUCATION */}
+      {education.length > 0 && (
+        <section className={`border-b ${mode.hairline} py-16 sm:py-24`}>
+          <div className="grid gap-10 sm:grid-cols-[10rem_1fr] sm:gap-12">
+            <h2
+              className={`text-[11px] font-semibold uppercase tracking-[0.28em] ${mode.muted}`}
+            >
               Education
             </h2>
 
-            <div className="mt-8 space-y-6">
+            <div className="space-y-10">
               {education.map((item, index) => (
-                <article key={item._id || index}>
-                  <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between">
-                    <h3 className={`text-lg font-semibold ${mode.heading}`}>
-                      {item.degree}
-                    </h3>
-                    {(item.startDate || item.endDate) && (
-                      <span className="text-xs font-medium text-stone-500">
-                        {item.startDate} {item.endDate ? `— ${item.endDate}` : ""}
+                <article
+                  key={item._id || index}
+                  className={`border-l-2 pl-6 ${mode.hairline}`}
+                >
+                  <p className={`text-xs tracking-wide ${mode.muted}`}>
+                    {formatDateRange(item.startDate, item.endDate)}
+                  </p>
+
+                  <h3
+                    className={`mt-2 text-lg font-medium tracking-tight ${mode.heading}`}
+                  >
+                    {item.degree}
+                  </h3>
+
+                  <p className={`mt-1 text-sm ${mode.text}`}>
+                    {item.institution}
+                    {item.fieldOfStudy && (
+                      <span className={mode.muted}>
+                        {" "}
+                        · {item.fieldOfStudy}
                       </span>
                     )}
-                  </div>
-
-                  <p className={`mt-1 text-sm font-medium ${mode.text}`}>
-                    {item.institution}
-                    {item.fieldOfStudy && <span className={mode.muted}> · {item.fieldOfStudy}</span>}
                   </p>
 
                   {item.description && (
-                    <p className={`mt-2 text-sm leading-relaxed ${mode.text}`}>
+                    <p
+                      className={`mt-3 max-w-xl text-sm leading-7 ${mode.text}`}
+                    >
                       {item.description}
                     </p>
                   )}
                 </article>
               ))}
             </div>
-          </section>
-        )}
+          </div>
+        </section>
+      )}
 
-        {/* Certifications Section */}
-        {certifications?.length > 0 && (
-          <section className="pb-8">
-            <h2 className={`text-xs font-semibold uppercase tracking-[0.2em] ${mode.muted}`}>
+      {/* CERTIFICATIONS */}
+      {certifications.length > 0 && (
+        <section className="py-16 sm:py-24">
+          <div className="grid gap-10 sm:grid-cols-[10rem_1fr] sm:gap-12">
+            <h2
+              className={`text-[11px] font-semibold uppercase tracking-[0.28em] ${mode.muted}`}
+            >
               Certifications
             </h2>
 
-            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-5 sm:grid-cols-2">
               {certifications.map((item, index) => (
                 <article
                   key={item._id || index}
-                  className={`rounded-lg border ${mode.card} p-5 transition ${theme.borderAccent}`}
+                  className={`rounded-2xl border ${mode.hairline} p-5`}
                 >
-                  <h3 className={`text-sm font-semibold ${mode.heading}`}>
+                  <h3
+                    className={`text-base font-medium ${mode.heading}`}
+                  >
                     {item.name}
                   </h3>
 
-                  <p className={`mt-1 text-xs font-medium ${mode.muted}`}>
+                  <p className={`mt-1 text-sm ${mode.muted}`}>
                     {item.issuer}
-                    {item.issueDate && ` · ${item.issueDate}`}
+                    {item.issueDate && ` · ${formatDate(item.issueDate)}`}
                   </p>
 
                   {item.description && (
-                    <p className={`mt-2 text-xs leading-relaxed ${mode.text}`}>
+                    <p
+                      className={`mt-3 text-sm leading-7 ${mode.text}`}
+                    >
                       {item.description}
                     </p>
                   )}
@@ -386,31 +452,37 @@ const fontClass = fontClasses[data.portfolio.font || "inter"];
                       href={item.credentialUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`mt-3 inline-block text-xs font-medium ${theme.accent} underline underline-offset-4 ${theme.accentHover}`}
+                      className={`mt-4 inline-block text-sm ${linkClass}`}
                     >
-                      Verify Credential ↗
+                      Verify credential →
                     </a>
                   )}
                 </article>
               ))}
             </div>
-          </section>
-        )}
-      </main>
+          </div>
+        </section>
+      )}
+    </main>
 
-      {/* Footer */}
-      <footer className={`border-t ${mode.border} ${mode.footer}`}>
-        <div className="mx-auto max-w-5xl px-6 py-8 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className={`text-xs font-medium ${mode.muted}`}>
-            © {new Date().getFullYear()} {personal?.name || portfolio?.title}. All rights reserved.
-          </p>
-          <a href="#top" className={`text-xs font-medium ${mode.muted} ${theme.accentHover}`}>
-            Back to top ↑
-          </a>
-        </div>
-      </footer>
-    </div>
-  );
+    {/* FOOTER */}
+    <footer className={`border-t ${mode.hairline}`}>
+      <div className="mx-auto flex max-w-4xl flex-col gap-4 px-6 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+        <p className={`text-xs ${mode.muted}`}>
+          © {new Date().getFullYear()}{" "}
+          {personal.name || portfolio.title}. All rights reserved.
+        </p>
+
+        <a
+          href="#content"
+          className={`text-xs ${mode.muted} transition ${theme.accentHover} focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
+        >
+          Back to top ↑
+        </a>
+      </div>
+    </footer>
+  </div>
+);
 };
 
 export default MinimalDeveloper;
