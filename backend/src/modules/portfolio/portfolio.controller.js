@@ -41,8 +41,9 @@ export const getSinglePortfolio = asyncHandler(async (req, res) => {
 
 export const getPublicPortfolio = asyncHandler(async (req, res) => {
   const portfolio = await portfolioService.getPublicPortfolio(
-    req.params.slug
-  );
+  req.params.slug,
+  req
+);
 
   res.status(200).json({
     success: true,
@@ -53,7 +54,8 @@ export const getPublicPortfolio = asyncHandler(async (req, res) => {
 
 export const getPublicResume = asyncHandler(async (req, res) => {
   const resumeUrl = await portfolioService.getPublicResume(
-    req.params.slug
+    req.params.slug,
+    req
   );
 
   res.redirect(resumeUrl);

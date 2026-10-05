@@ -35,6 +35,10 @@ const themeColors = {
 
 const MinimalDeveloper = ({ data = {} }) => {
   const portfolio = data.portfolio || {};
+  const resumeTrackingUrl = portfolio.resumeUrl
+  ? `http://localhost:5000/api/v1/portfolios/public/${portfolio.slug}/resume`
+  : "";
+  
   const personal = data.personal || {};
   const about = data.about || {};
   const social = data.social || {};
@@ -135,12 +139,12 @@ const MinimalDeveloper = ({ data = {} }) => {
             >
               {portfolio.resumeUrl && (
                 <a
-                  href={portfolio.resumeUrl}
+                  href={resumeTrackingUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={`inline-flex items-center rounded-full px-5 py-2.5 text-sm font-medium shadow-sm transition ${mode.button} focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
                 >
-                  View Resume
+                  Download Resume
                 </a>
               )}
 

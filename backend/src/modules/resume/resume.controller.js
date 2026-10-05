@@ -5,6 +5,8 @@ import Resume from "./resume.model.js";
 import Skill from "../portfolio/skill.model.js";
 import Education from "../portfolio/education.model.js";
 import Project from "../portfolio/project.model.js";
+import Portfolio from "../portfolio/portfolio.model.js";
+import cloudinaryService from "../../services/cloudinary.service.js";
 
 
 export const uploadResume = asyncHandler(async (req, res) => {
@@ -27,7 +29,22 @@ export const uploadResume = asyncHandler(async (req, res) => {
     req.file.buffer,
   );
 
+  if (!extractedText) {
+    return res.status(400).json({
+      success: false,
+      message: "Could not extract text from the resume PDF",
+    });
+  }
+
   const resumeData = parseResume(extractedText);
+  
+
+  const result = await cloudinaryService.uploadRawFile(
+  req.file.buffer,
+  "devfolio/resumes",
+  req.file.originalname
+);
+
 
   const resume = await Resume.create({
   userId: req.user._id,
@@ -39,14 +56,17 @@ export const uploadResume = asyncHandler(async (req, res) => {
   resumeData,
 });
 
+await Portfolio.findByIdAndUpdate(
+  portfolioId,
+  {
+    resumeUrl: result.secure_url,
+  },
+  { new: true }
+);
 
 
-  if (!extractedText) {
-    return res.status(400).json({
-      success: false,
-      message: "Could not extract text from the resume PDF",
-    });
-  }
+
+  
 
  res.status(200).json({
   success: true,

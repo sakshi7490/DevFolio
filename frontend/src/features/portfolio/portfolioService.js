@@ -357,6 +357,24 @@ const getPublicPortfolio = async (slug) => {
   return response.data;
 };
 
+const getAnalyticsSummary = async (
+  portfolioId,
+  startDate,
+  endDate
+) => {
+  const params = {};
+
+  if (startDate) params.startDate = startDate;
+  if (endDate) params.endDate = endDate;
+
+  const response = await api.get(
+    `/analytics/${portfolioId}`,
+    { params }
+  );
+
+  return response.data;
+};
+
 const generateAbout = async (data) => {
   const response = await api.post("/ai/about", data);
   return response.data;
@@ -431,6 +449,7 @@ export default {
   uploadPortfolioImage,
   getPortfolios,
   getPortfolio,
+  getAnalyticsSummary,
   uploadProfileImage,
   getAbout,
   updateAbout,

@@ -9,6 +9,8 @@ import Project from "./project.model.js";
 import Experience from "./experience.model.js";
 import ApiError from "../../utils/ApiError.js";
 import cloudinaryService from "../../services/cloudinary.service.js";
+import Analytics from "../analytics/analytics.model.js";
+import crypto from "crypto";
 
 const createPortfolio = async (userId, portfolioData) => {
   const { title, slug, description, technologies, liveUrl, githubUrl, featuredImage, resumeUrl } =
@@ -55,7 +57,7 @@ const getSinglePortfolio = async (portfolioId, userId) => {
   return portfolio;
 };
 
-const getPublicPortfolio = async (slug) => {
+const getPublicPortfolio = async (slug, req) => {
   const portfolio = await Portfolio.findOneAndUpdate(
     {
       slug,
@@ -74,6 +76,17 @@ const getPublicPortfolio = async (slug) => {
   }
 
   const portfolioId = portfolio._id;
+  const visitorId = crypto
+  .createHash("sha256")
+  .update(req.ip || "unknown")
+  .digest("hex");
+
+  await Analytics.create({
+  portfolioId,
+  eventType: "portfolio_view",
+  visitorId,
+  userAgent: req.get("user-agent") || "",
+});
 
   const [
     personal,
@@ -151,7 +164,7 @@ const getPortfolioForReview = async (portfolioId, userId) => {
   };
 };
 
-const getPublicResume = async (slug) => {
+const getPublicResume = async (slug, req) => {
   const portfolio = await Portfolio.findOne({
     slug,
     status: "published",
@@ -164,6 +177,18 @@ const getPublicResume = async (slug) => {
   if (!portfolio.resumeUrl) {
     throw new ApiError(404, "Resume not available");
   }
+
+  const visitorId = crypto
+  .createHash("sha256")
+  .update(req.ip || "unknown")
+  .digest("hex");
+
+await Analytics.create({
+  portfolioId: portfolio._id,
+  eventType: "resume_download",
+  visitorId,
+  userAgent: req.get("user-agent") || "",
+});
 
   return portfolio.resumeUrl;
 };

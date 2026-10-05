@@ -70,6 +70,10 @@ const CreativePortfolio = ({ data = {} }) => {
   const socialLinks = collectSocialLinks(social);
   const displayName = personal.name || portfolio.title || "Creative";
 
+  const resumeTrackingUrl = portfolio.resumeUrl
+  ? `http://localhost:5000/api/v1/portfolios/public/${portfolio.slug}/resume`
+  : "";
+
   const mode = isDark
     ? {
         page: "bg-[#0c0b10] text-stone-100",
@@ -117,16 +121,7 @@ const CreativePortfolio = ({ data = {} }) => {
                   {link.label}
                 </a>
               ))}
-              {portfolio.resumeUrl && (
-                <a
-                  href={portfolio.resumeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`${theme.text} font-medium focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
-                >
-                  Resume
-                </a>
-              )}
+              
             </nav>
           )}
         </div>
@@ -151,12 +146,12 @@ const CreativePortfolio = ({ data = {} }) => {
               <div className="mt-8 flex flex-wrap gap-3">
                 {portfolio.resumeUrl && (
                   <a
-                    href={portfolio.resumeUrl}
+                    href={resumeTrackingUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`rounded-full ${theme.bg} px-6 py-2.5 text-sm font-semibold text-white transition ${theme.hover} focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
                   >
-                    View resume
+                    Download Resume
                   </a>
                 )}
                 {social.github && (
