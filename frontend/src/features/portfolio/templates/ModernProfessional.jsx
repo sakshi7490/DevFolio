@@ -1,231 +1,323 @@
+import { useMemo, useState } from "react";
+import {
+  collectSocialLinks,
+  fontClasses,
+  formatDate,
+  formatDateRange,
+} from "./templateHelpers";
 
-const ModernProfessional = ({ data }) => {
-  const {
-    portfolio,
-    personal,
-    about,
-    social,
-    skills,
-    education,
-    certifications,
-    projects,
-    experience,
-  } = data;
-
-  
-
-  const fontClasses = {
-  inter: "font-sans",
-  poppins: "font-display",
-  serif: "font-serif",
-  mono: "font-mono",
+const themeColors = {
+  orange: {
+    accent: "text-orange-700",
+    accentBg: "bg-orange-700",
+    accentHover: "hover:bg-orange-800",
+    soft: "bg-orange-50 text-orange-800",
+    ring: "ring-orange-200",
+    borderHover: "hover:border-orange-200",
+    focus: "focus-visible:outline-orange-700",
+    bar: "bg-orange-700",
+  },
+  blue: {
+    accent: "text-blue-700",
+    accentBg: "bg-blue-700",
+    accentHover: "hover:bg-blue-800",
+    soft: "bg-blue-50 text-blue-800",
+    ring: "ring-blue-200",
+    borderHover: "hover:border-blue-200",
+    focus: "focus-visible:outline-blue-700",
+    bar: "bg-blue-700",
+  },
+  green: {
+    accent: "text-emerald-700",
+    accentBg: "bg-emerald-700",
+    accentHover: "hover:bg-emerald-800",
+    soft: "bg-emerald-50 text-emerald-800",
+    ring: "ring-emerald-200",
+    borderHover: "hover:border-emerald-200",
+    focus: "focus-visible:outline-emerald-700",
+    bar: "bg-emerald-700",
+  },
+  purple: {
+    accent: "text-violet-700",
+    accentBg: "bg-violet-700",
+    accentHover: "hover:bg-violet-800",
+    soft: "bg-violet-50 text-violet-800",
+    ring: "ring-violet-200",
+    borderHover: "hover:border-violet-200",
+    focus: "focus-visible:outline-violet-700",
+    bar: "bg-violet-700",
+  },
+  red: {
+    accent: "text-red-700",
+    accentBg: "bg-red-700",
+    accentHover: "hover:bg-red-800",
+    soft: "bg-red-50 text-red-800",
+    ring: "ring-red-200",
+    borderHover: "hover:border-red-200",
+    focus: "focus-visible:outline-red-700",
+    bar: "bg-red-700",
+  },
 };
 
-const fontClass = fontClasses[data.portfolio.font || "inter"];
+const ModernProfessional = ({ data = {} }) => {
+  const portfolio = data.portfolio || {};
+  const personal = data.personal || {};
+  const about = data.about || {};
+  const social = data.social || {};
+  const skills = data.skills || [];
+  const education = data.education || [];
+  const certifications = data.certifications || [];
+  const projects = data.projects || [];
+  const experience = data.experience || [];
 
-
+  const fontClass = fontClasses[portfolio.font || "inter"];
+  const theme = themeColors[portfolio.themeColor || "orange"];
   const isDark = (portfolio.themeMode || "dark") === "dark";
+  const socialLinks = collectSocialLinks(social);
+  const displayName = personal.name || portfolio.title || "Professional";
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const mode = isDark
     ? {
         page: "bg-slate-950 text-slate-100",
-        hero: "bg-slate-950 text-white",
-        section: "border-slate-800",
-        card: "bg-slate-900 border-slate-800",
+        header: "bg-slate-950/95 border-slate-800",
+        panel: "bg-slate-900 border-slate-800",
         muted: "text-slate-400",
-        heading: "text-slate-100",
-        soft: "bg-slate-800 text-slate-300",
-        imageBg: "bg-slate-800",
+        heading: "text-white",
+        text: "text-slate-300",
+        line: "border-slate-800",
+        chip: "bg-slate-800 text-slate-300",
+        ghost: "border-slate-700 text-slate-100 hover:bg-slate-800",
+        nav: "text-slate-300 hover:text-white",
+        footer: "bg-slate-900 border-slate-800",
+        image: "bg-slate-800",
       }
     : {
-        page: "bg-[#fafaf9] text-slate-900",
-        hero: "bg-white text-slate-900",
-        section: "border-slate-200",
-        card: "bg-white border-slate-200",
-        muted: "text-slate-600",
+        page: "bg-[#f4f6f9] text-slate-800",
+        header: "bg-white/95 border-slate-200",
+        panel: "bg-white border-slate-200",
+        muted: "text-slate-500",
         heading: "text-slate-900",
-        soft: "bg-slate-100 text-slate-500",
-        imageBg: "bg-slate-100",
+        text: "text-slate-600",
+        line: "border-slate-200",
+        chip: "bg-slate-100 text-slate-600",
+        ghost: "border-slate-300 text-slate-800 hover:bg-slate-50",
+        nav: "text-slate-600 hover:text-slate-950",
+        footer: "bg-slate-900 text-white border-slate-800",
+        image: "bg-slate-100",
       };
+
+  const sections = useMemo(() => {
+    const items = [];
+    if (about.content || portfolio.description) items.push({ id: "about", label: "About" });
+    if (skills.length) items.push({ id: "skills", label: "Skills" });
+    if (experience.length) items.push({ id: "experience", label: "Experience" });
+    if (projects.length) items.push({ id: "projects", label: "Projects" });
+    if (education.length) items.push({ id: "education", label: "Education" });
+    if (certifications.length) items.push({ id: "certifications", label: "Certifications" });
+    if (socialLinks.length || portfolio.resumeUrl) items.push({ id: "contact", label: "Contact" });
+    return items;
+  }, [
+    about.content,
+    portfolio.description,
+    portfolio.resumeUrl,
+    skills.length,
+    experience.length,
+    projects.length,
+    education.length,
+    certifications.length,
+    socialLinks.length,
+  ]);
+
+  const sectionNumber = (id) => {
+    const index = sections.findIndex((section) => section.id === id);
+    return String((index >= 0 ? index : 0) + 1).padStart(2, "0");
+  };
+
+  const SectionLabel = ({ id, title }) => (
+    <div className="md:pt-1">
+      <p className={`text-[11px] font-semibold tracking-[0.22em] ${theme.accent}`}>
+        {sectionNumber(id)}
+      </p>
+      <h2 className={`mt-2 text-sm font-semibold uppercase tracking-[0.16em] ${mode.heading}`}>
+        {title}
+      </h2>
+    </div>
+  );
 
   return (
     <div className={`min-h-screen ${fontClass} ${mode.page} antialiased`}>
-      {/* ================= HERO ================= */}
-      <section className={`relative overflow-hidden ${mode.hero}`}>
-        <div className="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-emerald-500/10 blur-3xl" />
-        <div className="absolute -bottom-32 right-0 h-80 w-80 rounded-full bg-cyan-500/10 blur-3xl" />
+      <div className={`h-1 ${theme.bar}`} />
 
-        <div className="relative mx-auto max-w-6xl px-6 py-20 lg:px-8 lg:py-28">
-          <div className="flex flex-col-reverse gap-12 md:flex-row md:items-center md:justify-between">
-            {/* Hero Content */}
-            <div className="max-w-3xl">
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2">
-                <span className="h-2 w-2 rounded-full bg-emerald-400" />
+      <header className={`relative sticky top-0 z-30 border-b ${mode.header} backdrop-blur`}>
 
-                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
-                  {personal?.headline || "Professional"}
-                </span>
-              </div>
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3 sm:px-8">
+          <a href="#top" className={`truncate text-sm font-semibold ${mode.heading}`}>
+            {displayName}
+          </a>
 
-              <h1 className="text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
-                {personal?.name || portfolio.title}
+          {sections.length > 0 && (
+            <>
+              <button
+                type="button"
+                className={`inline-flex items-center rounded-md border px-3 py-1.5 text-sm md:hidden ${mode.ghost} focus-visible:outline-2 focus-visible:outline-offset-2 ${theme.focus}`}
+                aria-expanded={menuOpen}
+                aria-controls="portfolio-nav"
+                onClick={() => setMenuOpen((open) => !open)}
+              >
+                Menu
+              </button>
+              <nav
+                id="portfolio-nav"
+                aria-label="Page sections"
+                className={`${menuOpen ? "absolute left-0 right-0 top-full border-b px-5 py-3" : "hidden"} md:static md:flex md:border-0 md:p-0 ${mode.header} md:bg-transparent`}
+              >
+                <ul className="flex flex-col gap-2 md:flex-row md:flex-wrap md:items-center md:gap-5">
+                  {sections.map((section) => (
+                    <li key={section.id}>
+                      <a
+                        href={`#${section.id}`}
+                        onClick={() => setMenuOpen(false)}
+                        className={`text-sm ${mode.nav} focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
+                      >
+                        {section.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            </>
+          )}
+        </div>
+      </header>
+
+      <section className="mx-auto max-w-6xl px-5 py-12 sm:px-8 lg:py-16">
+        <div className={`overflow-hidden rounded-2xl border shadow-sm ${mode.panel}`}>
+          <div className="grid gap-8 p-6 sm:p-10 lg:grid-cols-[minmax(0,1fr)_220px] lg:items-center">
+            <div>
+              <p className={`text-xs font-semibold uppercase tracking-[0.2em] ${theme.accent}`}>
+                {personal.headline || "Professional"}
+              </p>
+              <h1 className={`mt-3 text-4xl font-semibold tracking-tight ${mode.heading} sm:text-5xl lg:text-[3.4rem] lg:leading-[1.1]`}>
+                {displayName}
               </h1>
-
-              {personal?.location && (
-                <p className={`mt-5 flex items-center gap-2 text-sm ${mode.muted}`}>
-                  <span className="text-emerald-400">●</span>
-                  {personal.location}
-                </p>
+              {personal.location && (
+                <p className={`mt-4 text-sm ${mode.muted}`}>{personal.location}</p>
               )}
-
-              <div className="mt-9 flex flex-wrap gap-3">
-                {social?.linkedin && (
-                  <a
-                    href={social.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="rounded-xl bg-white px-5 py-3 text-sm font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-emerald-50"
-                  >
-                    LinkedIn
-                  </a>
-                )}
-
-                {social?.github && (
-                  <a
-                    href={social.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="rounded-xl border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/10"
-                  >
-                    GitHub
-                  </a>
-                )}
-
-                {portfolio.resumeUrl && (
-                  <a
-                    href={portfolio.resumeUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="rounded-xl border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:border-emerald-400/40 hover:bg-emerald-400/10"
-                  >
-                    Resume
-                  </a>
-                )}
-              </div>
+              {(portfolio.resumeUrl || social.linkedin || social.github) && (
+                <div className="mt-8 flex flex-wrap gap-3">
+                  {social.linkedin && (
+                    <a
+                      href={social.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`inline-flex items-center rounded-lg px-5 py-2.5 text-sm font-semibold text-white shadow-sm ${theme.accentBg} ${theme.accentHover} focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
+                    >
+                      LinkedIn
+                    </a>
+                  )}
+                  {social.github && (
+                    <a
+                      href={social.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`inline-flex items-center rounded-lg border px-5 py-2.5 text-sm font-semibold ${mode.ghost} focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
+                    >
+                      GitHub
+                    </a>
+                  )}
+                  {portfolio.resumeUrl && (
+                    <a
+                      href={portfolio.resumeUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`inline-flex items-center rounded-lg border px-5 py-2.5 text-sm font-semibold ${mode.ghost} focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
+                    >
+                      Resume
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
 
-            {/* Profile Image */}
-            {personal?.profileImage && (
-              <div className="relative shrink-0">
-                <div className="absolute -inset-3 rounded-[2rem] bg-gradient-to-br from-emerald-400/30 to-cyan-400/20 blur-xl" />
-
-                <div className="relative rounded-[2rem] border border-white/10 bg-white/5 p-2">
-                  <img
-                    src={personal.profileImage}
-                    alt={personal.name || portfolio.title}
-                    className="h-36 w-36 rounded-[1.5rem] object-cover sm:h-44 sm:w-44"
-                  />
-                </div>
-              </div>
+            {personal.profileImage && (
+              <img
+                src={personal.profileImage}
+                alt={personal.name || portfolio.title}
+                className={`mx-auto h-36 w-36 rounded-2xl object-cover shadow-md ring-1 ${mode.line} sm:h-44 sm:w-44 lg:mx-0 lg:justify-self-end`}
+              />
             )}
           </div>
         </div>
       </section>
 
-      {/* ================= MAIN ================= */}
-      <main className="mx-auto max-w-6xl px-6 lg:px-8">
-        {/* ================= ABOUT ================= */}
-        {(about?.content || portfolio.description) && (
-          <section className={`border-b ${mode.section} py-16 lg:py-20`}>
-            <div className="grid gap-8 md:grid-cols-[180px_1fr]">
-              <div>
-                <span className="text-xs font-bold tracking-[0.18em] text-emerald-600">
-                  01
-                </span>
-
-                <h2 className={`mt-2 text-sm font-bold uppercase tracking-[0.16em] ${mode.muted}`}>
-                  About
-                </h2>
-              </div>
-
-              <p className={`max-w-3xl text-lg leading-8 ${mode.muted}`}>
-                {about?.content || portfolio.description}
+      <main className="mx-auto max-w-6xl px-5 pb-16 sm:px-8">
+        {(about.content || portfolio.description) && (
+          <section id="about" className={`scroll-mt-24 border-b py-12 ${mode.line} lg:py-16`}>
+            <div className="grid gap-6 md:grid-cols-[180px_minmax(0,1fr)] md:gap-12">
+              <SectionLabel id="about" title="About" />
+              <p className={`max-w-3xl text-base leading-8 ${mode.text} sm:text-lg`}>
+                {about.content || portfolio.description}
               </p>
             </div>
           </section>
         )}
 
-        {/* ================= SKILLS ================= */}
-        {skills?.length > 0 && (
-          <section className={`border-b ${mode.section} py-16 lg:py-20`}>
-            <div className="grid gap-8 md:grid-cols-[180px_1fr]">
-              <div>
-                <span className="text-xs font-bold tracking-[0.18em] text-emerald-600">
-                  02
-                </span>
-
-                <h2 className={`mt-2 text-sm font-bold uppercase tracking-[0.16em] ${mode.muted}`}>
-                  Skills
-                </h2>
-              </div>
-
-              <div className="flex max-w-3xl flex-wrap gap-3">
-                {skills.map((skill) => (
-                  <span
-                    key={skill._id}
-                    className={`rounded-xl border ${mode.card} px-4 py-2.5 text-sm font-semibold shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700`}
+        {skills.length > 0 && (
+          <section id="skills" className={`scroll-mt-24 border-b py-12 ${mode.line} lg:py-16`}>
+            <div className="grid gap-6 md:grid-cols-[180px_minmax(0,1fr)] md:gap-12">
+              <SectionLabel id="skills" title="Skills" />
+              <ul className="flex max-w-3xl flex-wrap gap-2.5">
+                {skills.map((skill, index) => (
+                  <li
+                    key={skill._id || skill.name || index}
+                    className={`rounded-lg border px-3.5 py-2 text-sm font-medium shadow-sm ${mode.panel}`}
                   >
                     {skill.name}
-                  </span>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
           </section>
         )}
 
-        {/* ================= EXPERIENCE ================= */}
-        {experience?.length > 0 && (
-          <section className={`border-b ${mode.section} py-16 lg:py-20`}>
-            <div className="grid gap-8 md:grid-cols-[180px_1fr]">
-              <div>
-                <span className="text-xs font-bold tracking-[0.18em] text-emerald-600">
-                  03
-                </span>
-
-                <h2 className={`mt-2 text-sm font-bold uppercase tracking-[0.16em] ${mode.muted}`}>
-                  Experience
-                </h2>
-              </div>
-
-              <div className={`relative max-w-3xl space-y-6 border-l ${mode.section} pl-6 sm:pl-8`}>
-                {experience.map((item) => (
+        {experience.length > 0 && (
+          <section id="experience" className={`scroll-mt-24 border-b py-12 ${mode.line} lg:py-16`}>
+            <div className="grid gap-6 md:grid-cols-[180px_minmax(0,1fr)] md:gap-12">
+              <SectionLabel id="experience" title="Experience" />
+              <div className="space-y-5">
+                {experience.map((item, index) => (
                   <article
-                    key={item._id}
-                    className={`relative rounded-2xl border ${mode.card} p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md`}
+                    key={item._id || index}
+                    className={`rounded-2xl border p-6 shadow-sm ${mode.panel}`}
                   >
-                    <span className={`absolute -left-[31px] top-7 h-3 w-3 rounded-full border-2 border-emerald-500 ${isDark ? "bg-slate-950" : "bg-[#fafaf9]"} sm:-left-[37px]`} />
-
-                    <div className="flex flex-col justify-between gap-3 sm:flex-row">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div>
-                        <h3 className={`text-xl font-bold ${mode.heading}`}>
-                          {item.position}
-                        </h3>
-
-                        <p className="mt-1 text-sm font-semibold text-emerald-600">
+                        <h3 className={`text-xl font-semibold ${mode.heading}`}>{item.position}</h3>
+                        <p className={`mt-1 text-sm font-medium ${theme.accent}`}>
                           {item.company}
-                          {item.location && ` · ${item.location}`}
+                          {item.location && (
+                            <span className={mode.muted}> · {item.location}</span>
+                          )}
                         </p>
                       </div>
-
-                      <span className={`h-fit rounded-full ${mode.soft} px-3 py-1 text-xs font-semibold`}>
-                        {item.isCurrent ? "Present" : "Experience"}
-                      </span>
+                      <div className="flex flex-wrap items-center gap-2">
+                        {(item.startDate || item.endDate || item.isCurrent) && (
+                          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${mode.chip}`}>
+                            {formatDateRange(item.startDate, item.endDate, {
+                              presentIfOpen: item.isCurrent || !item.endDate,
+                            })}
+                          </span>
+                        )}
+                        {item.isCurrent && (
+                          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${isDark ? "bg-emerald-900/40 text-emerald-300" : theme.soft}`}>
+                            Present
+                          </span>
+                        )}
+                      </div>
                     </div>
-
                     {item.description && (
-                      <p className={`mt-5 leading-7 ${mode.muted}`}>
-                        {item.description}
-                      </p>
+                      <p className={`mt-4 text-sm leading-7 ${mode.text}`}>{item.description}</p>
                     )}
                   </article>
                 ))}
@@ -234,89 +326,66 @@ const fontClass = fontClasses[data.portfolio.font || "inter"];
           </section>
         )}
 
-        {/* ================= PROJECTS ================= */}
-        {projects?.length > 0 && (
-          <section className={`border-b ${mode.section} py-16 lg:py-20`}>
-            <div className="grid gap-8 md:grid-cols-[180px_1fr]">
-              <div>
-                <span className="text-xs font-bold tracking-[0.18em] text-emerald-600">
-                  04
-                </span>
-
-                <h2 className={`mt-2 text-sm font-bold uppercase tracking-[0.16em] ${mode.muted}`}>
-                  Projects
-                </h2>
-              </div>
-
-              <div className="grid gap-6 md:grid-cols-2">
-                {projects.map((project) => (
+        {projects.length > 0 && (
+          <section id="projects" className={`scroll-mt-24 border-b py-12 ${mode.line} lg:py-16`}>
+            <div className="grid gap-6 md:grid-cols-[180px_minmax(0,1fr)] md:gap-12">
+              <SectionLabel id="projects" title="Projects" />
+              <div className="grid gap-6 sm:grid-cols-2">
+                {projects.map((project, index) => (
                   <article
-                    key={project._id}
-                    className={`group overflow-hidden rounded-2xl border ${mode.card} shadow-sm transition duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-xl`}
+                    key={project._id || index}
+                    className={`flex flex-col overflow-hidden rounded-2xl border shadow-sm transition ${mode.panel} ${theme.borderHover} hover:shadow-md`}
                   >
                     {project.image && (
-                      <div className={`overflow-hidden ${mode.imageBg}`}>
+                      <div className={`border-b ${mode.line} ${mode.image}`}>
                         <img
                           src={project.image}
                           alt={project.title}
-                          className="h-52 w-full object-cover transition duration-500 group-hover:scale-105"
+                          className="h-44 w-full object-cover"
                         />
                       </div>
                     )}
-
-                    <div className="p-6">
-                      <div className="flex items-start justify-between gap-4">
-                        <h3 className={`text-xl font-bold ${mode.heading}`}>
-                          {project.title}
-                        </h3>
-
-                        <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-emerald-500" />
-                      </div>
-
+                    <div className="flex flex-1 flex-col p-6">
+                      <h3 className={`text-lg font-semibold ${mode.heading}`}>{project.title}</h3>
                       {project.description && (
-                        <p className={`mt-3 text-sm leading-6 ${mode.muted}`}>
-                          {project.description}
-                        </p>
+                        <p className={`mt-3 text-sm leading-6 ${mode.text}`}>{project.description}</p>
                       )}
-
                       {project.technologies?.length > 0 && (
-                        <div className="mt-5 flex flex-wrap gap-2">
-                          {project.technologies.map(
-                            (technology, index) => (
-                              <span
-                                key={`${technology}-${index}`}
-                                className={`rounded-lg ${mode.soft} px-2.5 py-1.5 text-xs font-medium`}
-                              >
-                                {technology}
-                              </span>
-                            )
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          {project.technologies.map((technology, techIndex) => (
+                            <span
+                              key={`${technology}-${techIndex}`}
+                              className={`rounded-md px-2.5 py-1 text-xs font-medium ${mode.chip}`}
+                            >
+                              {technology}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      {(project.projectUrl || project.githubUrl) && (
+                        <div className={`mt-auto flex flex-wrap gap-4 border-t pt-4 ${mode.line}`}>
+                          {project.projectUrl && (
+                            <a
+                              href={project.projectUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={`text-sm font-semibold ${theme.accent} hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
+                            >
+                              Live demo
+                            </a>
+                          )}
+                          {project.githubUrl && (
+                            <a
+                              href={project.githubUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={`text-sm font-semibold ${mode.muted} hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
+                            >
+                              GitHub
+                            </a>
                           )}
                         </div>
                       )}
-
-                      <div className={`mt-6 flex flex-wrap gap-4 border-t ${mode.section} pt-5`}>
-                        {project.projectUrl && (
-                          <a
-                            href={project.projectUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={`text-sm font-bold ${mode.heading} transition hover:text-emerald-600`}
-                          >
-                            View project →
-                          </a>
-                        )}
-
-                        {project.githubUrl && (
-                          <a
-                            href={project.githubUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={`text-sm font-bold ${mode.muted} transition hover:${isDark ? "text-white" : "text-slate-900"}`}
-                          >
-                            GitHub ↗
-                          </a>
-                        )}
-                      </div>
                     </div>
                   </article>
                 ))}
@@ -325,48 +394,34 @@ const fontClass = fontClasses[data.portfolio.font || "inter"];
           </section>
         )}
 
-        {/* ================= EDUCATION ================= */}
-        {education?.length > 0 && (
-          <section className={`border-b ${mode.section} py-16 lg:py-20`}>
-            <div className="grid gap-8 md:grid-cols-[180px_1fr]">
-              <div>
-                <span className="text-xs font-bold tracking-[0.18em] text-emerald-600">
-                  05
-                </span>
-
-                <h2 className={`mt-2 text-sm font-bold uppercase tracking-[0.16em] ${mode.muted}`}>
-                  Education
-                </h2>
-              </div>
-
-              <div className="grid max-w-3xl gap-5">
-                {education.map((item) => (
+        {education.length > 0 && (
+          <section id="education" className={`scroll-mt-24 border-b py-12 ${mode.line} lg:py-16`}>
+            <div className="grid gap-6 md:grid-cols-[180px_minmax(0,1fr)] md:gap-12">
+              <SectionLabel id="education" title="Education" />
+              <div className="space-y-5">
+                {education.map((item, index) => (
                   <article
-                    key={item._id}
-                    className={`rounded-2xl border ${mode.card} p-6 shadow-sm transition hover:border-emerald-200 hover:shadow-md`}
+                    key={item._id || index}
+                    className={`rounded-2xl border p-6 shadow-sm ${mode.panel}`}
                   >
-                    <div className="flex gap-4">
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-xs font-bold text-emerald-600">
-                        EDU
-                      </div>
-
+                    <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
                       <div>
-                        <h3 className={`text-xl font-bold ${mode.heading}`}>
-                          {item.degree}
-                        </h3>
-
-                        <p className="mt-1 text-sm font-semibold text-emerald-600">
+                        <h3 className={`text-xl font-semibold ${mode.heading}`}>{item.degree}</h3>
+                        <p className={`mt-1 text-sm font-medium ${theme.accent}`}>
                           {item.institution}
-                          {item.fieldOfStudy &&
-                            ` · ${item.fieldOfStudy}`}
+                          {item.fieldOfStudy && (
+                            <span className={mode.muted}> · {item.fieldOfStudy}</span>
+                          )}
                         </p>
                       </div>
+                      {(item.startDate || item.endDate) && (
+                        <span className={`h-fit rounded-full px-3 py-1 text-xs font-semibold ${mode.chip}`}>
+                          {formatDateRange(item.startDate, item.endDate)}
+                        </span>
+                      )}
                     </div>
-
                     {item.description && (
-                      <p className={`mt-5 pl-[60px] leading-7 ${mode.muted}`}>
-                        {item.description}
-                      </p>
+                      <p className={`mt-4 text-sm leading-7 ${mode.text}`}>{item.description}</p>
                     )}
                   </article>
                 ))}
@@ -375,65 +430,37 @@ const fontClass = fontClasses[data.portfolio.font || "inter"];
           </section>
         )}
 
-        {/* ================= CERTIFICATIONS ================= */}
-        {certifications?.length > 0 && (
-          <section className="py-16 lg:py-20">
-            <div className="grid gap-8 md:grid-cols-[180px_1fr]">
-              <div>
-                <span className="text-xs font-bold tracking-[0.18em] text-emerald-600">
-                  06
-                </span>
-
-                <h2 className={`mt-2 text-sm font-bold uppercase tracking-[0.16em] ${mode.muted}`}>
-                  Certifications
-                </h2>
-              </div>
-
-              <div className="grid max-w-3xl gap-5 md:grid-cols-2">
-                {certifications.map((item) => (
+        {certifications.length > 0 && (
+          <section
+            id="certifications"
+            className={`scroll-mt-24 py-12 lg:py-16 ${socialLinks.length || portfolio.resumeUrl ? `border-b ${mode.line}` : ""}`}
+          >
+            <div className="grid gap-6 md:grid-cols-[180px_minmax(0,1fr)] md:gap-12">
+              <SectionLabel id="certifications" title="Certifications" />
+              <div className="grid gap-5 sm:grid-cols-2">
+                {certifications.map((item, index) => (
                   <article
-                    key={item._id}
-                    className={`group rounded-2xl border ${mode.card} p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-md`}
+                    key={item._id || index}
+                    className={`rounded-2xl border p-6 shadow-sm ${mode.panel}`}
                   >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-                        ✓
-                      </div>
-
-                      {item.credentialUrl && (
-                        <a
-                          href={item.credentialUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={`text-xs font-semibold ${mode.muted} transition hover:text-emerald-600`}
-                        >
-                          Verify ↗
-                        </a>
-                      )}
-                    </div>
-
-                    <h3 className="mt-5 font-bold text-slate-900">
-                      {item.name}
-                    </h3>
-
-                    <p className="mt-1 text-sm font-semibold text-emerald-600">
+                    <h3 className={`font-semibold ${mode.heading}`}>{item.name}</h3>
+                    <p className={`mt-1 text-sm font-medium ${theme.accent}`}>
                       {item.issuer}
+                      {item.issueDate && (
+                        <span className={`font-normal ${mode.muted}`}> · {formatDate(item.issueDate)}</span>
+                      )}
                     </p>
-
                     {item.description && (
-                      <p className={`mt-3 text-sm leading-6 ${mode.muted}`}>
-                        {item.description}
-                      </p>
+                      <p className={`mt-3 text-sm leading-6 ${mode.text}`}>{item.description}</p>
                     )}
-
                     {item.credentialUrl && (
                       <a
                         href={item.credentialUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`mt-5 inline-block text-sm font-semibold ${mode.heading} transition hover:text-emerald-600`}
+                        className={`mt-4 inline-block text-sm font-semibold ${theme.accent} hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
                       >
-                        View credential →
+                        Verify credential
                       </a>
                     )}
                   </article>
@@ -442,23 +469,49 @@ const fontClass = fontClasses[data.portfolio.font || "inter"];
             </div>
           </section>
         )}
+
+        {(socialLinks.length > 0 || portfolio.resumeUrl) && (
+          <section id="contact" className="scroll-mt-24 py-12 lg:py-16">
+            <div className="grid gap-6 md:grid-cols-[180px_minmax(0,1fr)] md:gap-12">
+              <SectionLabel id="contact" title="Contact" />
+              <div className={`rounded-2xl border p-6 shadow-sm sm:p-8 ${mode.panel}`}>
+                <p className={`max-w-xl text-sm leading-7 ${mode.text}`}>
+                  Available for new opportunities. Reach out through any of the channels below.
+                </p>
+                <div className="mt-6 flex flex-wrap gap-3">
+                  {portfolio.resumeUrl && (
+                    <a
+                      href={portfolio.resumeUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`inline-flex rounded-lg px-4 py-2.5 text-sm font-semibold text-white ${theme.accentBg} ${theme.accentHover} focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
+                    >
+                      Resume
+                    </a>
+                  )}
+                  {socialLinks.map((link) => (
+                    <a
+                      key={link.key}
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`inline-flex rounded-lg border px-4 py-2.5 text-sm font-semibold ${mode.ghost} focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
+                    >
+                      {link.label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
       </main>
 
-      {/* ================= FOOTER ================= */}
-      <footer className="bg-slate-950 text-white">
-        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-10 sm:flex-row sm:items-center sm:justify-between lg:px-8">
-          <div>
-            <p className="font-semibold">
-              {portfolio.title}
-            </p>
-
-            <p className="mt-1 text-sm text-slate-500">
-              Built with DevFolio
-            </p>
-          </div>
-
-          <p className="text-xs text-slate-500">
-            © {new Date().getFullYear()} All rights reserved.
+      <footer className={`border-t ${mode.footer}`}>
+        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-5 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+          <p className="text-sm font-medium">{portfolio.title}</p>
+          <p className={`text-xs ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+            © {new Date().getFullYear()} All rights reserved. Built with DevFolio
           </p>
         </div>
       </footer>
