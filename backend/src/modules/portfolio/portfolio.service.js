@@ -8,6 +8,7 @@ import Certification from "./certification.model.js";
 import Project from "./project.model.js";
 import Experience from "./experience.model.js";
 import ApiError from "../../utils/ApiError.js";
+import cloudinaryService from "../../services/cloudinary.service.js";
 
 const createPortfolio = async (userId, portfolioData) => {
   const { title, slug, description, technologies, liveUrl, githubUrl, featuredImage, resumeUrl } =
@@ -180,6 +181,36 @@ const deletePortfolio = async (portfolioId, userId) => {
   return portfolio;
 };
 
+const uploadPortfolioImage = async (
+  portfolioId,
+  userId,
+  file
+) => {
+  const portfolio = await Portfolio.findOne({
+    _id: portfolioId,
+    userId,
+  });
+
+  if (!portfolio) {
+    throw new ApiError(404, "Portfolio not found");
+  }
+
+  if (!file) {
+    throw new ApiError(400, "Portfolio image is required");
+  }
+
+  const result = await cloudinaryService.uploadImage(
+    file.buffer,
+    "devfolio/portfolios"
+  );
+
+  portfolio.featuredImage = result.secure_url;
+
+  await portfolio.save();
+
+  return portfolio;
+};
+
 const updatePortfolioSettings = async (
   portfolioId,
   userId,
@@ -224,5 +255,6 @@ export default {
   getPublicResume,
   deletePortfolio,
   updatePortfolioSettings,
+  uploadPortfolioImage,
   getPortfolioForReview,
 };

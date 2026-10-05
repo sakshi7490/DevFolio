@@ -1,7 +1,7 @@
 import Project from "./project.model.js";
 import ApiError from "../../utils/ApiError.js";
 import Portfolio from "./portfolio.model.js";
-import cloudinary from "../../config/cloudinary.js";
+import cloudinaryService from "../../services/cloudinary.service.js";
 
 const createProject = async (userId, portfolioId, data) => {
   const project = await Project.create({
@@ -78,8 +78,8 @@ const deleteProject = async (
 
 const uploadProjectImage = async (
   portfolioId,
-  projectId,
   userId,
+  projectId,
   file
 ) => {
   const project = await Project.findOne({
@@ -95,13 +95,10 @@ const uploadProjectImage = async (
     throw new ApiError(400, "Project image is required");
   }
 
-  const result = await cloudinary.uploader.upload(
-    file.path,
-    {
-      folder: "devfolio/projects",
-    }
-  );
-
+  const result = await cloudinaryService.uploadImage(
+  file.buffer,
+  "devfolio/projects"
+);
   project.image = result.secure_url;
 
   await project.save();

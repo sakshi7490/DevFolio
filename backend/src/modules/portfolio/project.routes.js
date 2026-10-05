@@ -1,4 +1,5 @@
 import express from "express";
+import upload from "../../middleware/upload.middleware.js";
 
 import {
   create,
@@ -6,6 +7,8 @@ import {
   getOne,
   update,
   remove,
+  uploadImage,
+
 } from "./project.controller.js";
 
 import { protect } from "../../middleware/auth.middleware.js";
@@ -28,6 +31,12 @@ router.patch(
 router.delete(
   "/:portfolioId/projects/:projectId",
   remove
+);
+
+router.post(
+  "/:portfolioId/projects/:projectId/image",
+  upload.single("image"),
+  uploadImage
 );
 
 export default router;

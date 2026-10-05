@@ -5,6 +5,22 @@ const createPortfolio = async (portfolioData) => {
 
   return response.data;
 };
+const uploadPortfolioImage = async (portfolioId, imageFile) => {
+  const formData = new FormData();
+  formData.append("image", imageFile);
+
+  const response = await api.post(
+    `/portfolios/${portfolioId}/image`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+
+  return response.data;
+};
 
 const getPortfolios = async () => {
   const response = await api.get("/portfolios");
@@ -412,6 +428,7 @@ const importGithubRepositories = async (portfolioId, repositories) => {
 
 export default {
   createPortfolio,
+  uploadPortfolioImage,
   getPortfolios,
   getPortfolio,
   uploadProfileImage,

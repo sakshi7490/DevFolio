@@ -1,4 +1,5 @@
 import express from "express";
+import upload from "../../middleware/upload.middleware.js";
 import validate from "../../middleware/validation.middleware.js";
 import {
   createPortfolioSchema,
@@ -12,6 +13,7 @@ import {
   getPublicResume,
   deletePortfolio,
   updatePortfolioSettings,
+  uploadPortfolioImage,
 } from "./portfolio.controller.js";
 
 import { protect } from "../../middleware/auth.middleware.js";
@@ -36,5 +38,12 @@ router.patch(
   protect,
   validate(updatePortfolioSettingsSchema),
   updatePortfolioSettings
+);
+
+router.post(
+  "/:id/image",
+  protect,
+  upload.single("image"),
+  uploadPortfolioImage
 );
 export default router;

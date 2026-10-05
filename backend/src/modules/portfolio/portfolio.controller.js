@@ -88,3 +88,20 @@ export const updatePortfolioSettings = asyncHandler(
     });
   }
 );
+
+export const uploadPortfolioImage = asyncHandler(
+  async (req, res) => {
+    const portfolio =
+      await portfolioService.uploadPortfolioImage(
+        req.params.id,
+        req.user._id,
+        req.file
+      );
+
+    res.status(200).json({
+      success: true,
+      message: "Portfolio image uploaded successfully",
+      data: portfolio,
+    });
+  }
+);

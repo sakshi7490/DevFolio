@@ -14,6 +14,9 @@ const PortfolioForm = ({ onSubmit, onCancel, loading = false }) => {
     featuredImage: "",
   });
 
+  const [imageFile, setImageFile] = useState(null);
+const [imagePreview, setImagePreview] = useState("");
+
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
@@ -27,6 +30,15 @@ const PortfolioForm = ({ onSubmit, onCancel, loading = false }) => {
       [name]: "",
     }));
   };
+
+  const handleImageChange = (e) => {
+  const file = e.target.files[0];
+
+  if (!file) return;
+
+  setImageFile(file);
+  setImagePreview(URL.createObjectURL(file));
+};
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -63,10 +75,13 @@ const PortfolioForm = ({ onSubmit, onCancel, loading = false }) => {
         .filter(Boolean),
       liveUrl: formData.liveUrl.trim(),
       githubUrl: formData.githubUrl.trim(),
-      featuredImage: formData.featuredImage.trim(),
+      
     };
 
-    onSubmit(portfolioData);
+    onSubmit({
+  portfolioData,
+  imageFile,
+});
   };
 
   return (
@@ -147,14 +162,24 @@ const PortfolioForm = ({ onSubmit, onCancel, loading = false }) => {
         onChange={handleChange}
       />
 
-      <Input
-        label="Featured image URL"
-        name="featuredImage"
-        type="url"
-        placeholder="https://example.com/image.png"
-        value={formData.featuredImage}
-        onChange={handleChange}
-      />
+      <div>
+  <label className={labelClass}>Featured image</label>
+
+  <input
+    type="file"
+    accept="image/jpeg,image/png,image/jpg"
+    onChange={handleImageChange}
+    className={fieldClass}
+  />
+
+  {imagePreview && (
+    <img
+      src={imagePreview}
+      alt="Featured preview"
+      className="mt-4 h-48 w-full rounded-xl object-cover"
+    />
+  )}
+</div>
 
       <div className="flex flex-wrap gap-3 pt-2">
         <Button type="submit" loading={loading} loadingText="Creating...">

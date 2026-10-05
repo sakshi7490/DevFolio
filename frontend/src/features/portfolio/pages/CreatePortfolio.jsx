@@ -11,19 +11,34 @@ const CreatePortfolio = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = async (portfolioData) => {
-    try {
-      setLoading(true);
-      setError("");
-      await portfolioService.createPortfolio(portfolioData);
-      navigate("/dashboard/portfolios");
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to create portfolio");
-    } finally {
-      setLoading(false);
-    }
-  };
+ const handleSubmit = async ({ portfolioData, imageFile }) => {
+  try {
+    setLoading(true);
+    setError("");
 
+    const response = await portfolioService.createPortfolio(
+      portfolioData
+    );
+
+    const portfolioId = response.data._id;
+
+    if (imageFile) {
+      await portfolioService.uploadPortfolioImage(
+        portfolioId,
+        imageFile
+      );
+    }
+
+    navigate("/dashboard/portfolios");
+  } catch (err) {
+    setError(
+      err.response?.data?.message ||
+        "Failed to create portfolio"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div className="mx-auto max-w-3xl">
       <PageHeader
