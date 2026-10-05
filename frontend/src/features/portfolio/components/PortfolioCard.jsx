@@ -84,10 +84,18 @@ const PortfolioCard = ({ portfolio, onDelete }) => {
           <span className="text-xs text-muted">
             {new Date(portfolio.createdAt).toLocaleDateString()}
           </span>
+          <button
+            onClick={() =>
+              navigate(`/dashboard/portfolios/${portfolio._id}/analytics`)
+            }
+            className="text-sm font-medium text-accent hover:text-emerald-800"
+          >
+            📊 Analytics
+          </button>
           <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={() => navigate(`/dashboard/portfolios/${portfolio._id}`)}
-              className="text-sm font-medium text-accent hover:text-emerald-800"
+              className="text-center text-sm font-medium text-accent hover:text-emerald-800"
             >
               View
             </button>
@@ -95,7 +103,7 @@ const PortfolioCard = ({ portfolio, onDelete }) => {
               onClick={() =>
                 navigate(`/dashboard/portfolios/${portfolio._id}/edit`)
               }
-              className="text-sm font-medium text-stone-600 hover:text-ink"
+              className="text-center text-sm font-medium text-stone-600 hover:text-ink"
             >
               Edit
             </button>
@@ -103,14 +111,14 @@ const PortfolioCard = ({ portfolio, onDelete }) => {
               onClick={() =>
                 navigate(`/dashboard/portfolios/${portfolio._id}/settings`)
               }
-              className="text-sm font-medium text-stone-600 hover:text-ink"
+              className=" text-center text-sm font-medium text-stone-600 hover:text-ink"
             >
               Settings
             </button>
             <button
               onClick={handleDelete}
               disabled={deleting}
-              className="text-sm font-medium text-red-600 hover:text-red-700 disabled:opacity-50"
+              className=" text-center text-sm font-medium text-red-600 hover:text-red-700 disabled:opacity-50"
             >
               {deleting ? "Deleting..." : "Delete"}
             </button>

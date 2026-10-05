@@ -61,6 +61,10 @@ const themeColors = {
 
 const ModernProfessional = ({ data = {} }) => {
   const portfolio = data.portfolio || {};
+  const resumeTrackingUrl = portfolio.resumeUrl
+  ? `http://localhost:5000/api/v1/portfolios/public/${portfolio.slug}/resume`
+  : "";
+  
   const personal = data.personal || {};
   const about = data.about || {};
   const social = data.social || {};
@@ -228,12 +232,12 @@ const ModernProfessional = ({ data = {} }) => {
                   )}
                   {portfolio.resumeUrl && (
                     <a
-                      href={portfolio.resumeUrl}
+                      href={resumeTrackingUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className={`inline-flex items-center rounded-lg border px-5 py-2.5 text-sm font-semibold ${mode.ghost} focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
                     >
-                      Resume
+                      Download Resume
                     </a>
                   )}
                 </div>
@@ -481,12 +485,12 @@ const ModernProfessional = ({ data = {} }) => {
                 <div className="mt-6 flex flex-wrap gap-3">
                   {portfolio.resumeUrl && (
                     <a
-                      href={portfolio.resumeUrl}
+                      href={resumeTrackingUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className={`inline-flex rounded-lg px-4 py-2.5 text-sm font-semibold text-white ${theme.accentBg} ${theme.accentHover} focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
                     >
-                      Resume
+                      Download Resume
                     </a>
                   )}
                   {socialLinks.map((link) => (

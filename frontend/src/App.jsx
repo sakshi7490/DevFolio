@@ -16,6 +16,7 @@ import PublicPortfolio from "./features/portfolio/pages/PublicPortfolio";
 import PortfolioReview from "./features/portfolio/pages/PortfolioReview";
 import ResumeImport from "./features/portfolio/pages/ResumeImport";
 import GithubImport from "./features/portfolio/pages/GithubImport";
+import PortfolioAnalytics from "./features/portfolio/pages/PortfolioAnalytics";
 
 function App() {
   return (
@@ -37,6 +38,10 @@ function App() {
           <Route
             path="/dashboard/portfolios/create"
             element={<CreatePortfolio />}
+          />
+          <Route
+            path="/dashboard/portfolios/:id/analytics"
+            element={<PortfolioAnalytics />}
           />
           <Route
             path="/dashboard/portfolios/:id"
