@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import axios from "axios";
+
 import {
   collectSocialLinks,
   fontClasses,
@@ -62,9 +64,9 @@ const themeColors = {
 const ModernProfessional = ({ data = {} }) => {
   const portfolio = data.portfolio || {};
   const resumeTrackingUrl = portfolio.resumeUrl
-  ? `http://localhost:5000/api/v1/portfolios/public/${portfolio.slug}/resume`
-  : "";
-  
+    ? `http://localhost:5000/api/v1/portfolios/public/${portfolio.slug}/resume`
+    : "";
+
   const personal = data.personal || {};
   const about = data.about || {};
   const social = data.social || {};
@@ -80,6 +82,55 @@ const ModernProfessional = ({ data = {} }) => {
   const socialLinks = collectSocialLinks(social);
   const displayName = personal.name || portfolio.title || "Professional";
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const [contactForm, setContactForm] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
+
+  const [contactStatus, setContactStatus] = useState({
+    loading: false,
+    success: "",
+    error: "",
+  });
+
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
+
+    setContactStatus({
+      loading: true,
+      success: "",
+      error: "",
+    });
+
+    try {
+      await axios.post(
+        `http://localhost:5000/api/v1/contact/${portfolio.slug}`,
+        contactForm,
+      );
+
+      setContactForm({
+        name: "",
+        email: "",
+        subject: "",
+        message: "",
+      });
+
+      setContactStatus({
+        loading: false,
+        success: "Your message has been sent successfully.",
+        error: "",
+      });
+    } catch (error) {
+      setContactStatus({
+        loading: false,
+        success: "",
+        error: error.response?.data?.message || "Failed to send message.",
+      });
+    }
+  };
 
   const mode = isDark
     ? {
@@ -113,13 +164,17 @@ const ModernProfessional = ({ data = {} }) => {
 
   const sections = useMemo(() => {
     const items = [];
-    if (about.content || portfolio.description) items.push({ id: "about", label: "About" });
+    if (about.content || portfolio.description)
+      items.push({ id: "about", label: "About" });
     if (skills.length) items.push({ id: "skills", label: "Skills" });
-    if (experience.length) items.push({ id: "experience", label: "Experience" });
+    if (experience.length)
+      items.push({ id: "experience", label: "Experience" });
     if (projects.length) items.push({ id: "projects", label: "Projects" });
     if (education.length) items.push({ id: "education", label: "Education" });
-    if (certifications.length) items.push({ id: "certifications", label: "Certifications" });
-    if (socialLinks.length || portfolio.resumeUrl) items.push({ id: "contact", label: "Contact" });
+    if (certifications.length)
+      items.push({ id: "certifications", label: "Certifications" });
+    if (socialLinks.length || portfolio.resumeUrl)
+      items.push({ id: "contact", label: "Contact" });
     return items;
   }, [
     about.content,
@@ -140,10 +195,14 @@ const ModernProfessional = ({ data = {} }) => {
 
   const SectionLabel = ({ id, title }) => (
     <div className="md:pt-1">
-      <p className={`text-[11px] font-semibold tracking-[0.22em] ${theme.accent}`}>
+      <p
+        className={`text-[11px] font-semibold tracking-[0.22em] ${theme.accent}`}
+      >
         {sectionNumber(id)}
       </p>
-      <h2 className={`mt-2 text-sm font-semibold uppercase tracking-[0.16em] ${mode.heading}`}>
+      <h2
+        className={`mt-2 text-sm font-semibold uppercase tracking-[0.16em] ${mode.heading}`}
+      >
         {title}
       </h2>
     </div>
@@ -153,10 +212,14 @@ const ModernProfessional = ({ data = {} }) => {
     <div className={`min-h-screen ${fontClass} ${mode.page} antialiased`}>
       <div className={`h-1 ${theme.bar}`} />
 
-      <header className={`relative sticky top-0 z-30 border-b ${mode.header} backdrop-blur`}>
-
+      <header
+        className={`relative sticky top-0 z-30 border-b ${mode.header} backdrop-blur`}
+      >
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3 sm:px-8">
-          <a href="#top" className={`truncate text-sm font-semibold ${mode.heading}`}>
+          <a
+            href="#top"
+            className={`truncate text-sm font-semibold ${mode.heading}`}
+          >
             {displayName}
           </a>
 
@@ -196,17 +259,25 @@ const ModernProfessional = ({ data = {} }) => {
       </header>
 
       <section className="mx-auto max-w-6xl px-5 py-12 sm:px-8 lg:py-16">
-        <div className={`overflow-hidden rounded-2xl border shadow-sm ${mode.panel}`}>
+        <div
+          className={`overflow-hidden rounded-2xl border shadow-sm ${mode.panel}`}
+        >
           <div className="grid gap-8 p-6 sm:p-10 lg:grid-cols-[minmax(0,1fr)_220px] lg:items-center">
             <div>
-              <p className={`text-xs font-semibold uppercase tracking-[0.2em] ${theme.accent}`}>
+              <p
+                className={`text-xs font-semibold uppercase tracking-[0.2em] ${theme.accent}`}
+              >
                 {personal.headline || "Professional"}
               </p>
-              <h1 className={`mt-3 text-4xl font-semibold tracking-tight ${mode.heading} sm:text-5xl lg:text-[3.4rem] lg:leading-[1.1]`}>
+              <h1
+                className={`mt-3 text-4xl font-semibold tracking-tight ${mode.heading} sm:text-5xl lg:text-[3.4rem] lg:leading-[1.1]`}
+              >
                 {displayName}
               </h1>
               {personal.location && (
-                <p className={`mt-4 text-sm ${mode.muted}`}>{personal.location}</p>
+                <p className={`mt-4 text-sm ${mode.muted}`}>
+                  {personal.location}
+                </p>
               )}
               {(portfolio.resumeUrl || social.linkedin || social.github) && (
                 <div className="mt-8 flex flex-wrap gap-3">
@@ -257,10 +328,15 @@ const ModernProfessional = ({ data = {} }) => {
 
       <main className="mx-auto max-w-6xl px-5 pb-16 sm:px-8">
         {(about.content || portfolio.description) && (
-          <section id="about" className={`scroll-mt-24 border-b py-12 ${mode.line} lg:py-16`}>
+          <section
+            id="about"
+            className={`scroll-mt-24 border-b py-12 ${mode.line} lg:py-16`}
+          >
             <div className="grid gap-6 md:grid-cols-[180px_minmax(0,1fr)] md:gap-12">
               <SectionLabel id="about" title="About" />
-              <p className={`max-w-3xl text-base leading-8 ${mode.text} sm:text-lg`}>
+              <p
+                className={`max-w-3xl text-base leading-8 ${mode.text} sm:text-lg`}
+              >
                 {about.content || portfolio.description}
               </p>
             </div>
@@ -268,7 +344,10 @@ const ModernProfessional = ({ data = {} }) => {
         )}
 
         {skills.length > 0 && (
-          <section id="skills" className={`scroll-mt-24 border-b py-12 ${mode.line} lg:py-16`}>
+          <section
+            id="skills"
+            className={`scroll-mt-24 border-b py-12 ${mode.line} lg:py-16`}
+          >
             <div className="grid gap-6 md:grid-cols-[180px_minmax(0,1fr)] md:gap-12">
               <SectionLabel id="skills" title="Skills" />
               <ul className="flex max-w-3xl flex-wrap gap-2.5">
@@ -286,7 +365,10 @@ const ModernProfessional = ({ data = {} }) => {
         )}
 
         {experience.length > 0 && (
-          <section id="experience" className={`scroll-mt-24 border-b py-12 ${mode.line} lg:py-16`}>
+          <section
+            id="experience"
+            className={`scroll-mt-24 border-b py-12 ${mode.line} lg:py-16`}
+          >
             <div className="grid gap-6 md:grid-cols-[180px_minmax(0,1fr)] md:gap-12">
               <SectionLabel id="experience" title="Experience" />
               <div className="space-y-5">
@@ -297,31 +379,44 @@ const ModernProfessional = ({ data = {} }) => {
                   >
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div>
-                        <h3 className={`text-xl font-semibold ${mode.heading}`}>{item.position}</h3>
-                        <p className={`mt-1 text-sm font-medium ${theme.accent}`}>
+                        <h3 className={`text-xl font-semibold ${mode.heading}`}>
+                          {item.position}
+                        </h3>
+                        <p
+                          className={`mt-1 text-sm font-medium ${theme.accent}`}
+                        >
                           {item.company}
                           {item.location && (
-                            <span className={mode.muted}> · {item.location}</span>
+                            <span className={mode.muted}>
+                              {" "}
+                              · {item.location}
+                            </span>
                           )}
                         </p>
                       </div>
                       <div className="flex flex-wrap items-center gap-2">
                         {(item.startDate || item.endDate || item.isCurrent) && (
-                          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${mode.chip}`}>
+                          <span
+                            className={`rounded-full px-3 py-1 text-xs font-semibold ${mode.chip}`}
+                          >
                             {formatDateRange(item.startDate, item.endDate, {
                               presentIfOpen: item.isCurrent || !item.endDate,
                             })}
                           </span>
                         )}
                         {item.isCurrent && (
-                          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${isDark ? "bg-emerald-900/40 text-emerald-300" : theme.soft}`}>
+                          <span
+                            className={`rounded-full px-3 py-1 text-xs font-semibold ${isDark ? "bg-emerald-900/40 text-emerald-300" : theme.soft}`}
+                          >
                             Present
                           </span>
                         )}
                       </div>
                     </div>
                     {item.description && (
-                      <p className={`mt-4 text-sm leading-7 ${mode.text}`}>{item.description}</p>
+                      <p className={`mt-4 text-sm leading-7 ${mode.text}`}>
+                        {item.description}
+                      </p>
                     )}
                   </article>
                 ))}
@@ -331,7 +426,10 @@ const ModernProfessional = ({ data = {} }) => {
         )}
 
         {projects.length > 0 && (
-          <section id="projects" className={`scroll-mt-24 border-b py-12 ${mode.line} lg:py-16`}>
+          <section
+            id="projects"
+            className={`scroll-mt-24 border-b py-12 ${mode.line} lg:py-16`}
+          >
             <div className="grid gap-6 md:grid-cols-[180px_minmax(0,1fr)] md:gap-12">
               <SectionLabel id="projects" title="Projects" />
               <div className="grid gap-6 sm:grid-cols-2">
@@ -350,9 +448,13 @@ const ModernProfessional = ({ data = {} }) => {
                       </div>
                     )}
                     <div className="flex flex-1 flex-col p-6">
-                      <h3 className={`text-lg font-semibold ${mode.heading}`}>{project.title}</h3>
+                      <h3 className={`text-lg font-semibold ${mode.heading}`}>
+                        {project.title}
+                      </h3>
                       {project.description && (
-                        <p className={`mt-3 text-sm leading-6 ${mode.text}`}>{project.description}</p>
+                        <p className={`mt-3 text-sm leading-6 ${mode.text}`}>
+                          {project.description}
+                        </p>
                       )}
                       {project.technologies?.length > 0 && (
                         <div className="mt-4 flex flex-wrap gap-2">
@@ -367,7 +469,9 @@ const ModernProfessional = ({ data = {} }) => {
                         </div>
                       )}
                       {(project.projectUrl || project.githubUrl) && (
-                        <div className={`mt-auto flex flex-wrap gap-4 border-t pt-4 ${mode.line}`}>
+                        <div
+                          className={`mt-auto flex flex-wrap gap-4 border-t pt-4 ${mode.line}`}
+                        >
                           {project.projectUrl && (
                             <a
                               href={project.projectUrl}
@@ -399,7 +503,10 @@ const ModernProfessional = ({ data = {} }) => {
         )}
 
         {education.length > 0 && (
-          <section id="education" className={`scroll-mt-24 border-b py-12 ${mode.line} lg:py-16`}>
+          <section
+            id="education"
+            className={`scroll-mt-24 border-b py-12 ${mode.line} lg:py-16`}
+          >
             <div className="grid gap-6 md:grid-cols-[180px_minmax(0,1fr)] md:gap-12">
               <SectionLabel id="education" title="Education" />
               <div className="space-y-5">
@@ -410,22 +517,33 @@ const ModernProfessional = ({ data = {} }) => {
                   >
                     <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
                       <div>
-                        <h3 className={`text-xl font-semibold ${mode.heading}`}>{item.degree}</h3>
-                        <p className={`mt-1 text-sm font-medium ${theme.accent}`}>
+                        <h3 className={`text-xl font-semibold ${mode.heading}`}>
+                          {item.degree}
+                        </h3>
+                        <p
+                          className={`mt-1 text-sm font-medium ${theme.accent}`}
+                        >
                           {item.institution}
                           {item.fieldOfStudy && (
-                            <span className={mode.muted}> · {item.fieldOfStudy}</span>
+                            <span className={mode.muted}>
+                              {" "}
+                              · {item.fieldOfStudy}
+                            </span>
                           )}
                         </p>
                       </div>
                       {(item.startDate || item.endDate) && (
-                        <span className={`h-fit rounded-full px-3 py-1 text-xs font-semibold ${mode.chip}`}>
+                        <span
+                          className={`h-fit rounded-full px-3 py-1 text-xs font-semibold ${mode.chip}`}
+                        >
                           {formatDateRange(item.startDate, item.endDate)}
                         </span>
                       )}
                     </div>
                     {item.description && (
-                      <p className={`mt-4 text-sm leading-7 ${mode.text}`}>{item.description}</p>
+                      <p className={`mt-4 text-sm leading-7 ${mode.text}`}>
+                        {item.description}
+                      </p>
                     )}
                   </article>
                 ))}
@@ -447,15 +565,22 @@ const ModernProfessional = ({ data = {} }) => {
                     key={item._id || index}
                     className={`rounded-2xl border p-6 shadow-sm ${mode.panel}`}
                   >
-                    <h3 className={`font-semibold ${mode.heading}`}>{item.name}</h3>
+                    <h3 className={`font-semibold ${mode.heading}`}>
+                      {item.name}
+                    </h3>
                     <p className={`mt-1 text-sm font-medium ${theme.accent}`}>
                       {item.issuer}
                       {item.issueDate && (
-                        <span className={`font-normal ${mode.muted}`}> · {formatDate(item.issueDate)}</span>
+                        <span className={`font-normal ${mode.muted}`}>
+                          {" "}
+                          · {formatDate(item.issueDate)}
+                        </span>
                       )}
                     </p>
                     {item.description && (
-                      <p className={`mt-3 text-sm leading-6 ${mode.text}`}>{item.description}</p>
+                      <p className={`mt-3 text-sm leading-6 ${mode.text}`}>
+                        {item.description}
+                      </p>
                     )}
                     {item.credentialUrl && (
                       <a
@@ -478,10 +603,88 @@ const ModernProfessional = ({ data = {} }) => {
           <section id="contact" className="scroll-mt-24 py-12 lg:py-16">
             <div className="grid gap-6 md:grid-cols-[180px_minmax(0,1fr)] md:gap-12">
               <SectionLabel id="contact" title="Contact" />
-              <div className={`rounded-2xl border p-6 shadow-sm sm:p-8 ${mode.panel}`}>
+              <div
+                className={`rounded-2xl border p-6 shadow-sm sm:p-8 ${mode.panel}`}
+              >
                 <p className={`max-w-xl text-sm leading-7 ${mode.text}`}>
-                  Available for new opportunities. Reach out through any of the channels below.
+                  Available for new opportunities. Reach out through any of the
+                  channels below.
                 </p>
+
+                <form
+                  onSubmit={handleContactSubmit}
+                  className="mt-8 max-w-2xl space-y-4"
+                >
+                  <input
+                    type="text"
+                    placeholder="Your name"
+                    value={contactForm.name}
+                    onChange={(e) =>
+                      setContactForm({ ...contactForm, name: e.target.value })
+                    }
+                    required
+                    className={`w-full rounded-lg border px-4 py-3 text-sm outline-none ${mode.panel} ${mode.text}`}
+                  />
+
+                  <input
+                    type="email"
+                    placeholder="Your email"
+                    value={contactForm.email}
+                    onChange={(e) =>
+                      setContactForm({ ...contactForm, email: e.target.value })
+                    }
+                    required
+                    className={`w-full rounded-lg border px-4 py-3 text-sm outline-none ${mode.panel} ${mode.text}`}
+                  />
+
+                  <input
+                    type="text"
+                    placeholder="Subject"
+                    value={contactForm.subject}
+                    onChange={(e) =>
+                      setContactForm({
+                        ...contactForm,
+                        subject: e.target.value,
+                      })
+                    }
+                    className={`w-full rounded-lg border px-4 py-3 text-sm outline-none ${mode.panel} ${mode.text}`}
+                  />
+
+                  <textarea
+                    placeholder="Your message"
+                    rows={5}
+                    value={contactForm.message}
+                    onChange={(e) =>
+                      setContactForm({
+                        ...contactForm,
+                        message: e.target.value,
+                      })
+                    }
+                    required
+                    className={`w-full rounded-lg border px-4 py-3 text-sm outline-none ${mode.panel} ${mode.text}`}
+                  />
+
+                  <button
+                    type="submit"
+                    disabled={contactStatus.loading}
+                    className={`rounded-lg px-5 py-2.5 text-sm font-semibold text-white ${theme.accentBg} ${theme.accentHover} disabled:opacity-50`}
+                  >
+                    {contactStatus.loading ? "Sending..." : "Send Message"}
+                  </button>
+
+                  {contactStatus.success && (
+                    <p className="text-sm text-emerald-600">
+                      {contactStatus.success}
+                    </p>
+                  )}
+
+                  {contactStatus.error && (
+                    <p className="text-sm text-red-600">
+                      {contactStatus.error}
+                    </p>
+                  )}
+                </form>
+
                 <div className="mt-6 flex flex-wrap gap-3">
                   {portfolio.resumeUrl && (
                     <a
@@ -514,8 +717,11 @@ const ModernProfessional = ({ data = {} }) => {
       <footer className={`border-t ${mode.footer}`}>
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-5 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-8">
           <p className="text-sm font-medium">{portfolio.title}</p>
-          <p className={`text-xs ${isDark ? "text-slate-500" : "text-slate-400"}`}>
-            © {new Date().getFullYear()} All rights reserved. Built with DevFolio
+          <p
+            className={`text-xs ${isDark ? "text-slate-500" : "text-slate-400"}`}
+          >
+            © {new Date().getFullYear()} All rights reserved. Built with
+            DevFolio
           </p>
         </div>
       </footer>

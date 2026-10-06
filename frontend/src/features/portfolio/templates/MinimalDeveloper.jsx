@@ -1,3 +1,5 @@
+import axios from "axios";
+import {  useState } from "react";
 import {
   collectSocialLinks,
   fontClasses,
@@ -53,6 +55,57 @@ const MinimalDeveloper = ({ data = {} }) => {
   const isDark = (portfolio.themeMode || "dark") === "dark";
   const socialLinks = collectSocialLinks(social);
   const displayName = personal.name || portfolio.title || "Developer Portfolio";
+
+  const [contactForm, setContactForm] = useState({
+  name: "",
+  email: "",
+  subject: "",
+  message: "",
+});
+
+const [contactStatus, setContactStatus] = useState({
+  loading: false,
+  success: "",
+  error: "",
+});
+
+const handleContactSubmit = async (e) => {
+  e.preventDefault();
+
+  setContactStatus({
+    loading: true,
+    success: "",
+    error: "",
+  });
+
+  try {
+    await axios.post(
+      `http://localhost:5000/api/v1/contact/${portfolio.slug}`,
+      contactForm,
+    );
+
+    setContactForm({
+      name: "",
+      email: "",
+      subject: "",
+      message: "",
+    });
+
+    setContactStatus({
+      loading: false,
+      success: "Your message has been sent successfully.",
+      error: "",
+    });
+  } catch (error) {
+    setContactStatus({
+      loading: false,
+      success: "",
+      error:
+        error.response?.data?.message ||
+        "Failed to send message.",
+    });
+  }
+};
 
   const mode = isDark
     ? {
@@ -468,6 +521,103 @@ const MinimalDeveloper = ({ data = {} }) => {
         </section>
       )}
     </main>
+
+          {/* CONTACT */}
+      <section className={`border-t ${mode.hairline} py-16 sm:py-24`}>
+        <div className="grid gap-10 sm:grid-cols-[10rem_1fr] sm:gap-12">
+          <h2
+            className={`text-[11px] font-semibold uppercase tracking-[0.28em] ${mode.muted}`}
+          >
+            Contact
+          </h2>
+
+          <div className="max-w-2xl">
+            <p className={`text-xl leading-8 ${mode.text}`}>
+              Have an opportunity, idea, or just want to say hello?
+            </p>
+
+            <form
+              onSubmit={handleContactSubmit}
+              className="mt-8 space-y-4"
+            >
+              <input
+                type="text"
+                placeholder="Your name"
+                value={contactForm.name}
+                onChange={(e) =>
+                  setContactForm({
+                    ...contactForm,
+                    name: e.target.value,
+                  })
+                }
+                required
+                className={`w-full rounded-xl border ${mode.hairline} bg-transparent px-4 py-3 text-sm outline-none ${mode.text}`}
+              />
+
+              <input
+                type="email"
+                placeholder="Your email"
+                value={contactForm.email}
+                onChange={(e) =>
+                  setContactForm({
+                    ...contactForm,
+                    email: e.target.value,
+                  })
+                }
+                required
+                className={`w-full rounded-xl border ${mode.hairline} bg-transparent px-4 py-3 text-sm outline-none ${mode.text}`}
+              />
+
+              <input
+                type="text"
+                placeholder="Subject"
+                value={contactForm.subject}
+                onChange={(e) =>
+                  setContactForm({
+                    ...contactForm,
+                    subject: e.target.value,
+                  })
+                }
+                className={`w-full rounded-xl border ${mode.hairline} bg-transparent px-4 py-3 text-sm outline-none ${mode.text}`}
+              />
+
+              <textarea
+                placeholder="Your message"
+                rows={6}
+                value={contactForm.message}
+                onChange={(e) =>
+                  setContactForm({
+                    ...contactForm,
+                    message: e.target.value,
+                  })
+                }
+                required
+                className={`w-full rounded-xl border ${mode.hairline} bg-transparent px-4 py-3 text-sm outline-none ${mode.text}`}
+              />
+
+              <button
+                type="submit"
+                disabled={contactStatus.loading}
+                className={`rounded-full px-5 py-2.5 text-sm font-medium shadow-sm transition ${mode.button} disabled:opacity-50`}
+              >
+                {contactStatus.loading ? "Sending..." : "Send Message"}
+              </button>
+
+              {contactStatus.success && (
+                <p className="text-sm text-emerald-600">
+                  {contactStatus.success}
+                </p>
+              )}
+
+              {contactStatus.error && (
+                <p className="text-sm text-red-600">
+                  {contactStatus.error}
+                </p>
+              )}
+            </form>
+          </div>
+        </div>
+      </section>
 
     {/* FOOTER */}
     <footer className={`border-t ${mode.hairline}`}>

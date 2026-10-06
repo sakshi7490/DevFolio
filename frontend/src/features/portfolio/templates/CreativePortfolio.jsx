@@ -1,3 +1,6 @@
+import {  useState } from "react";
+import axios from "axios";
+
 import {
   collectSocialLinks,
   fontClasses,
@@ -69,6 +72,57 @@ const CreativePortfolio = ({ data = {} }) => {
   const isDark = (portfolio.themeMode || "dark") === "dark";
   const socialLinks = collectSocialLinks(social);
   const displayName = personal.name || portfolio.title || "Creative";
+
+  const [contactForm, setContactForm] = useState({
+  name: "",
+  email: "",
+  subject: "",
+  message: "",
+});
+
+const [contactStatus, setContactStatus] = useState({
+  loading: false,
+  success: "",
+  error: "",
+});
+
+const handleContactSubmit = async (e) => {
+  e.preventDefault();
+
+  setContactStatus({
+    loading: true,
+    success: "",
+    error: "",
+  });
+
+  try {
+    await axios.post(
+      `http://localhost:5000/api/v1/contact/${portfolio.slug}`,
+      contactForm,
+    );
+
+    setContactForm({
+      name: "",
+      email: "",
+      subject: "",
+      message: "",
+    });
+
+    setContactStatus({
+      loading: false,
+      success: "Your message has been sent successfully.",
+      error: "",
+    });
+  } catch (error) {
+    setContactStatus({
+      loading: false,
+      success: "",
+      error:
+        error.response?.data?.message ||
+        "Failed to send message.",
+    });
+  }
+};
 
   const resumeTrackingUrl = portfolio.resumeUrl
   ? `http://localhost:5000/api/v1/portfolios/public/${portfolio.slug}/resume`
@@ -435,6 +489,107 @@ const CreativePortfolio = ({ data = {} }) => {
           </section>
         )}
       </main>
+
+
+              <section className={`border-y ${mode.line} ${mode.wash}`}>
+        <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 lg:py-24">
+          <p
+            className={`text-[11px] font-semibold uppercase tracking-[0.32em] ${theme.text}`}
+          >
+            Contact
+          </p>
+
+          <h2
+            className={`mt-4 text-4xl font-semibold tracking-tight ${mode.heading} sm:text-5xl`}
+          >
+            Let's connect.
+          </h2>
+
+          <p className={`mt-4 max-w-xl leading-7 ${mode.muted}`}>
+            Have an opportunity, idea, or just want to say hello? Send a message.
+          </p>
+
+          <form
+            onSubmit={handleContactSubmit}
+            className="mt-10 max-w-2xl space-y-4"
+          >
+            <input
+              type="text"
+              placeholder="Your name"
+              value={contactForm.name}
+              onChange={(e) =>
+                setContactForm({
+                  ...contactForm,
+                  name: e.target.value,
+                })
+              }
+              required
+              className={`w-full rounded-2xl border px-5 py-3.5 text-sm outline-none ${mode.card} ${mode.heading}`}
+            />
+
+            <input
+              type="email"
+              placeholder="Your email"
+              value={contactForm.email}
+              onChange={(e) =>
+                setContactForm({
+                  ...contactForm,
+                  email: e.target.value,
+                })
+              }
+              required
+              className={`w-full rounded-2xl border px-5 py-3.5 text-sm outline-none ${mode.card} ${mode.heading}`}
+            />
+
+            <input
+              type="text"
+              placeholder="Subject"
+              value={contactForm.subject}
+              onChange={(e) =>
+                setContactForm({
+                  ...contactForm,
+                  subject: e.target.value,
+                })
+              }
+              className={`w-full rounded-2xl border px-5 py-3.5 text-sm outline-none ${mode.card} ${mode.heading}`}
+            />
+
+            <textarea
+              placeholder="Your message"
+              rows={6}
+              value={contactForm.message}
+              onChange={(e) =>
+                setContactForm({
+                  ...contactForm,
+                  message: e.target.value,
+                })
+              }
+              required
+              className={`w-full rounded-2xl border px-5 py-3.5 text-sm outline-none ${mode.card} ${mode.heading}`}
+            />
+
+            <button
+              type="submit"
+              disabled={contactStatus.loading}
+              className={`rounded-full ${theme.bg} px-6 py-3 text-sm font-semibold text-white transition ${theme.hover} disabled:opacity-50`}
+            >
+              {contactStatus.loading ? "Sending..." : "Send Message"}
+            </button>
+
+            {contactStatus.success && (
+              <p className="text-sm text-emerald-500">
+                {contactStatus.success}
+              </p>
+            )}
+
+            {contactStatus.error && (
+              <p className="text-sm text-rose-500">
+                {contactStatus.error}
+              </p>
+            )}
+          </form>
+        </div>
+      </section>
 
       <footer className={`relative overflow-hidden border-t ${mode.line}`}>
         <div
