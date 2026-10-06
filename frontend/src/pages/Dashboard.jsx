@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FolderKanban, UserRound } from "lucide-react";
+import { FolderKanban, UserRound, Inbox } from "lucide-react";
 
 import useAuth from "../hooks/useAuth";
 import { getProfile } from "../services/user.service";
@@ -78,6 +78,17 @@ const Dashboard = () => {
           <h3 className="font-semibold text-ink">Account profile</h3>
           <p className="mt-1 text-sm text-muted">
             Keep your name and account details current.
+          </p>
+        </button>
+
+        <button
+          onClick={() => navigate("/dashboard/messages")}
+          className="rounded-2xl border border-stone-200 bg-white p-5 text-left shadow-sm transition hover:border-accent/40"
+        >
+          <Inbox className="mb-3 text-accent" size={22} />
+          <h3 className="font-semibold text-ink">Messages</h3>
+          <p className="mt-1 text-sm text-muted">
+            View and manage messages received through your portfolios.
           </p>
         </button>
       </div>

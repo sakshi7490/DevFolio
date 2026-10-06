@@ -3,6 +3,8 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import Messages from "./pages/Messages";
+import MessageDetail from "./pages/MessageDetail";
 import Profile from "./pages/Profile";
 import PortfolioList from "./features/portfolio/pages/PortfolioList";
 import CreatePortfolio from "./features/portfolio/pages/CreatePortfolio";
@@ -33,6 +35,11 @@ function App() {
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard/messages" element={<Messages />} />
+          <Route
+            path="/dashboard/messages/:messageId"
+            element={<MessageDetail />}
+          />
           <Route path="/profile" element={<Profile />} />
           <Route path="/dashboard/portfolios" element={<PortfolioList />} />
           <Route

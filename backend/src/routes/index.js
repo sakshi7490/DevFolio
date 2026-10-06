@@ -16,6 +16,7 @@ import reviewRoutes from "../modules/ai/review.routes.js";
 import resumeRoutes from "../modules/resume/resume.routes.js";
 import githubRoutes from "../modules/github/github.routes.js";
 import analyticsRoutes from "../modules/analytics/analytics.routes.js";
+import contactRoutes from "../modules/contact/contact.routes.js";
 
 const router = Router();
 
@@ -58,5 +59,8 @@ router.use("/github", githubRoutes);
 
 //analytics route
 router.use("/analytics", analyticsRoutes);
+
+//contact route
+router.use("/contact", contactRoutes);
 
 export default router;
