@@ -107,3 +107,23 @@ export const uploadPortfolioImage = asyncHandler(
     });
   }
 );
+
+export const getAdminPortfolios = asyncHandler(async (req, res) => {
+  const portfolios = await portfolioService.getAllPortfoliosForAdmin();
+
+  res.status(200).json({
+    success: true,
+    data: {
+      portfolios,
+    },
+  });
+});
+
+export const removeAdminPortfolio = asyncHandler(async (req, res) => {
+  await portfolioService.deletePortfolioByAdmin(req.params.portfolioId);
+
+  res.status(200).json({
+    success: true,
+    message: "Portfolio removed successfully",
+  });
+});

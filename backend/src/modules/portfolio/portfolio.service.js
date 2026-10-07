@@ -44,6 +44,22 @@ const getUserPortfolios = async (userId) => {
   return portfolios;
 };
 
+const getAllPortfoliosForAdmin = async () => {
+  return await Portfolio.find()
+    .populate("userId", "name email")
+    .sort({ createdAt: -1 });
+};
+
+const deletePortfolioByAdmin = async (portfolioId) => {
+  const portfolio = await Portfolio.findByIdAndDelete(portfolioId);
+
+  if (!portfolio) {
+    throw new ApiError(404, "Portfolio not found");
+  }
+
+  return portfolio;
+};
+
 const getSinglePortfolio = async (portfolioId, userId) => {
   const portfolio = await Portfolio.findOne({
     _id: portfolioId,
@@ -275,6 +291,8 @@ const updatePortfolioSettings = async (
 export default {
   createPortfolio,
   getUserPortfolios,
+  getAllPortfoliosForAdmin,
+  deletePortfolioByAdmin,
   getSinglePortfolio,
   getPublicPortfolio,
   getPublicResume,
