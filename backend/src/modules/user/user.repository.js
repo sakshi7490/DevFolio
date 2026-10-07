@@ -16,3 +16,10 @@ export const updateUserById = async (userId, updateData) => {
     }
   ).select("-password");
 };
+
+// Find all users
+export const findAllUsers = async () => {
+  return await User.find()
+    .select("-password")
+    .sort({ createdAt: -1 });
+};
