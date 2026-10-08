@@ -1,11 +1,12 @@
-import {  useState } from "react";
-import axios from "axios";
-
+import { useMemo, useState } from "react";
 import {
+  buildSectionNav,
   collectSocialLinks,
   fontClasses,
   formatDate,
   formatDateRange,
+  getResumeTrackingUrl,
+  submitPortfolioContact,
 } from "./templateHelpers";
 
 const themeColors = {
@@ -13,7 +14,6 @@ const themeColors = {
     text: "text-orange-500",
     bg: "bg-orange-500",
     hover: "hover:bg-orange-400",
-    border: "border-orange-400/40",
     soft: "bg-orange-500/10",
     glow: "from-orange-400/25 via-amber-300/10 to-transparent",
     focus: "focus-visible:outline-orange-500",
@@ -22,7 +22,6 @@ const themeColors = {
     text: "text-sky-500",
     bg: "bg-sky-500",
     hover: "hover:bg-sky-400",
-    border: "border-sky-400/40",
     soft: "bg-sky-500/10",
     glow: "from-sky-400/25 via-indigo-300/10 to-transparent",
     focus: "focus-visible:outline-sky-500",
@@ -31,7 +30,6 @@ const themeColors = {
     text: "text-teal-500",
     bg: "bg-teal-500",
     hover: "hover:bg-teal-400",
-    border: "border-teal-400/40",
     soft: "bg-teal-500/10",
     glow: "from-teal-400/25 via-emerald-300/10 to-transparent",
     focus: "focus-visible:outline-teal-500",
@@ -40,7 +38,6 @@ const themeColors = {
     text: "text-fuchsia-500",
     bg: "bg-fuchsia-500",
     hover: "hover:bg-fuchsia-400",
-    border: "border-fuchsia-400/40",
     soft: "bg-fuchsia-500/10",
     glow: "from-fuchsia-400/20 via-violet-300/10 to-transparent",
     focus: "focus-visible:outline-fuchsia-500",
@@ -49,7 +46,6 @@ const themeColors = {
     text: "text-rose-500",
     bg: "bg-rose-500",
     hover: "hover:bg-rose-400",
-    border: "border-rose-400/40",
     soft: "bg-rose-500/10",
     glow: "from-rose-400/25 via-orange-300/10 to-transparent",
     focus: "focus-visible:outline-rose-500",
@@ -72,61 +68,65 @@ const CreativePortfolio = ({ data = {} }) => {
   const isDark = (portfolio.themeMode || "dark") === "dark";
   const socialLinks = collectSocialLinks(social);
   const displayName = personal.name || portfolio.title || "Creative";
+  const resumeTrackingUrl = getResumeTrackingUrl(portfolio);
+
+  const sections = useMemo(
+    () =>
+      buildSectionNav({
+        about,
+        portfolio,
+        skills,
+        experience,
+        projects,
+        education,
+        certifications,
+      }),
+    [
+      about,
+      portfolio,
+      skills,
+      experience,
+      projects,
+      education,
+      certifications,
+    ],
+  );
 
   const [contactForm, setContactForm] = useState({
-  name: "",
-  email: "",
-  subject: "",
-  message: "",
-});
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
 
-const [contactStatus, setContactStatus] = useState({
-  loading: false,
-  success: "",
-  error: "",
-});
-
-const handleContactSubmit = async (e) => {
-  e.preventDefault();
-
-  setContactStatus({
-    loading: true,
+  const [contactStatus, setContactStatus] = useState({
+    loading: false,
     success: "",
     error: "",
   });
 
-  try {
-    await axios.post(
-      `http://localhost:5000/api/v1/contact/${portfolio.slug}`,
-      contactForm,
-    );
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
 
-    setContactForm({
-      name: "",
-      email: "",
-      subject: "",
-      message: "",
-    });
+    setContactStatus({ loading: true, success: "", error: "" });
 
-    setContactStatus({
-      loading: false,
-      success: "Your message has been sent successfully.",
-      error: "",
-    });
-  } catch (error) {
-    setContactStatus({
-      loading: false,
-      success: "",
-      error:
-        error.response?.data?.message ||
-        "Failed to send message.",
-    });
-  }
-};
+    try {
+      await submitPortfolioContact(portfolio.slug, contactForm);
 
-  const resumeTrackingUrl = portfolio.resumeUrl
-  ? `http://localhost:5000/api/v1/portfolios/public/${portfolio.slug}/resume`
-  : "";
+      setContactForm({ name: "", email: "", subject: "", message: "" });
+      setContactStatus({
+        loading: false,
+        success: "Your message has been sent successfully.",
+        error: "",
+      });
+    } catch (error) {
+      setContactStatus({
+        loading: false,
+        success: "",
+        error: error.response?.data?.message || "Failed to send message.",
+      });
+    }
+  };
 
   const mode = isDark
     ? {
@@ -136,6 +136,8 @@ const handleContactSubmit = async (e) => {
         card: "bg-white/5 border-white/10",
         wash: "bg-white/[0.03]",
         line: "border-white/10",
+        nav: "border-white/10 bg-[#0c0b10]/80",
+        field: "bg-white/5 border-white/10 text-white placeholder:text-stone-500",
       }
     : {
         page: "bg-[#f7f3ee] text-stone-900",
@@ -144,6 +146,8 @@ const handleContactSubmit = async (e) => {
         card: "bg-white/70 border-stone-200/80",
         wash: "bg-white/50",
         line: "border-stone-200",
+        nav: "border-stone-200/80 bg-[#f7f3ee]/80",
+        field: "bg-white/70 border-stone-200 text-stone-950 placeholder:text-stone-400",
       };
 
   return (
@@ -157,53 +161,55 @@ const handleContactSubmit = async (e) => {
         aria-hidden="true"
       />
 
-      <header className="relative mx-auto max-w-6xl px-5 pb-8 pt-8 sm:px-8 sm:pt-12">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <p className={`text-xs font-semibold uppercase tracking-[0.28em] ${theme.text}`}>
-            {personal.headline || "Creative Professional"}
-          </p>
-          {(socialLinks.length > 0 || portfolio.resumeUrl) && (
-            <nav aria-label="Profile links" className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
-              {socialLinks.slice(0, 3).map((link) => (
-                <a
-                  key={link.key}
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`${mode.muted} transition hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
-                >
-                  {link.label}
-                </a>
-              ))}
-              
-            </nav>
-          )}
+      <nav
+        className={`sticky top-0 z-40 border-b backdrop-blur-md ${mode.nav}`}
+        aria-label="Page sections"
+      >
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3 sm:px-8">
+          <a
+            href="#top"
+            className={`truncate text-sm font-semibold tracking-tight ${mode.heading}`}
+          >
+            {displayName}
+          </a>
+          <div className="flex items-center gap-4 overflow-x-auto text-xs font-medium sm:gap-5">
+            {sections.map((section) => (
+              <a
+                key={section.id}
+                href={`#${section.id}`}
+                className={`shrink-0 transition hover:opacity-80 ${mode.muted} focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
+              >
+                {section.label}
+              </a>
+            ))}
+          </div>
         </div>
-      </header>
+      </nav>
 
-      <section className="relative mx-auto max-w-6xl px-5 pb-20 sm:px-8 lg:pb-28">
-        <div className="grid items-end gap-10 lg:grid-cols-[minmax(0,1fr)_280px]">
+      <header id="top" className="relative mx-auto max-w-6xl px-5 pb-20 pt-10 sm:px-8 sm:pt-14 lg:pb-28">
+        <p className={`text-xs font-semibold uppercase tracking-[0.28em] ${theme.text}`}>
+          {personal.headline || "Creative Professional"}
+        </p>
+
+        <div className="mt-8 grid items-end gap-10 lg:grid-cols-[minmax(0,1fr)_280px]">
           <div>
-            <h1 className={`max-w-4xl text-[3.1rem] font-semibold leading-[0.92] tracking-[-0.05em] ${mode.heading} sm:text-7xl lg:text-[6.2rem]`}>
+            <h1
+              className={`max-w-4xl text-[3.1rem] font-semibold leading-[0.92] tracking-[-0.05em] ${mode.heading} sm:text-7xl lg:text-[6.2rem]`}
+            >
               {displayName}
               <span className={theme.text}>.</span>
             </h1>
-            {portfolio.description && (
-              <p className={`mt-8 max-w-xl text-lg leading-8 ${mode.muted}`}>
-                {portfolio.description}
-              </p>
-            )}
             {personal.location && (
-              <p className={`mt-5 text-sm ${mode.muted}`}>{personal.location}</p>
+              <p className={`mt-6 text-sm ${mode.muted}`}>{personal.location}</p>
             )}
-            {(social.github || social.linkedin || portfolio.resumeUrl) && (
+            {(social.github || social.linkedin || resumeTrackingUrl) && (
               <div className="mt-8 flex flex-wrap gap-3">
-                {portfolio.resumeUrl && (
+                {resumeTrackingUrl && (
                   <a
                     href={resumeTrackingUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`rounded-full ${theme.bg} px-6 py-2.5 text-sm font-semibold text-white transition ${theme.hover} focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
+                    className={`rounded-full ${theme.bg} px-6 py-2.5 text-sm font-semibold text-white transition ${theme.hover} hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
                   >
                     Download Resume
                   </a>
@@ -213,7 +219,7 @@ const handleContactSubmit = async (e) => {
                     href={social.github}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`rounded-full border ${mode.card} px-5 py-2.5 text-sm font-medium backdrop-blur transition hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
+                    className={`rounded-full border px-5 py-2.5 text-sm font-medium backdrop-blur transition hover:-translate-y-0.5 ${mode.card} focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
                   >
                     GitHub
                   </a>
@@ -223,7 +229,7 @@ const handleContactSubmit = async (e) => {
                     href={social.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`rounded-full border ${mode.card} px-5 py-2.5 text-sm font-medium backdrop-blur transition hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
+                    className={`rounded-full border px-5 py-2.5 text-sm font-medium backdrop-blur transition hover:-translate-y-0.5 ${mode.card} focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
                   >
                     LinkedIn
                   </a>
@@ -245,22 +251,29 @@ const handleContactSubmit = async (e) => {
               <img
                 src={personal.profileImage}
                 alt={personal.name || portfolio.title}
-                className={`relative h-52 w-44 -rotate-3 rounded-[2rem] object-cover shadow-2xl ring-1 ${mode.line} sm:h-64 sm:w-52`}
+                className={`relative h-52 w-44 -rotate-3 rounded-[2rem] object-cover shadow-2xl ring-1 transition duration-500 hover:rotate-0 ${mode.line} sm:h-64 sm:w-52`}
               />
             </div>
           )}
         </div>
-      </section>
+      </header>
 
       <main>
         {(about.content || portfolio.description) && (
-          <section className={`relative border-y ${mode.line} ${mode.wash}`}>
+          <section
+            id="about"
+            className={`relative scroll-mt-24 border-y ${mode.line} ${mode.wash}`}
+          >
             <div className="mx-auto grid max-w-6xl gap-8 px-5 py-16 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:py-24">
               <div>
-                <p className={`text-[11px] font-semibold uppercase tracking-[0.32em] ${theme.text}`}>
+                <p
+                  className={`text-[11px] font-semibold uppercase tracking-[0.32em] ${theme.text}`}
+                >
                   About
                 </p>
-                <h2 className={`mt-4 text-4xl font-semibold tracking-tight ${mode.heading} sm:text-5xl`}>
+                <h2
+                  className={`mt-4 text-4xl font-semibold tracking-tight ${mode.heading} sm:text-5xl`}
+                >
                   The story.
                 </h2>
               </div>
@@ -272,18 +285,23 @@ const handleContactSubmit = async (e) => {
         )}
 
         {skills.length > 0 && (
-          <section className="mx-auto max-w-6xl px-5 py-16 sm:px-8 lg:py-24">
+          <section
+            id="skills"
+            className="mx-auto max-w-6xl scroll-mt-24 px-5 py-16 sm:px-8 lg:py-24"
+          >
             <p className={`text-[11px] font-semibold uppercase tracking-[0.32em] ${theme.text}`}>
               Skills
             </p>
-            <h2 className={`mt-4 max-w-md text-4xl font-semibold tracking-tight ${mode.heading} sm:text-5xl`}>
+            <h2
+              className={`mt-4 max-w-md text-4xl font-semibold tracking-tight ${mode.heading} sm:text-5xl`}
+            >
               Tools in motion.
             </h2>
             <div className="mt-10 flex flex-wrap gap-3">
               {skills.map((skill, index) => (
                 <span
                   key={skill._id || skill.name || index}
-                  className={`rounded-full border px-5 py-2.5 text-sm font-medium ${mode.card} ${index % 3 === 0 ? theme.text : ""} ${index % 4 === 0 ? "sm:text-base sm:px-6 sm:py-3" : ""}`}
+                  className={`rounded-full border px-5 py-2.5 text-sm font-medium transition hover:-translate-y-0.5 ${mode.card} ${index % 3 === 0 ? theme.text : ""} ${index % 4 === 0 ? "sm:px-6 sm:py-3 sm:text-base" : ""}`}
                 >
                   {skill.name}
                 </span>
@@ -293,15 +311,20 @@ const handleContactSubmit = async (e) => {
         )}
 
         {experience.length > 0 && (
-          <section className={`border-y ${mode.line} ${mode.wash}`}>
+          <section
+            id="experience"
+            className={`scroll-mt-24 border-y ${mode.line} ${mode.wash}`}
+          >
             <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 lg:py-24">
               <p className={`text-[11px] font-semibold uppercase tracking-[0.32em] ${theme.text}`}>
                 Experience
               </p>
-              <h2 className={`mt-4 text-4xl font-semibold tracking-tight ${mode.heading} sm:text-5xl`}>
+              <h2
+                className={`mt-4 text-4xl font-semibold tracking-tight ${mode.heading} sm:text-5xl`}
+              >
                 Path so far.
               </h2>
-              <div className="mt-12 space-y-0">
+              <div className="mt-12">
                 {experience.map((item, index) => (
                   <article
                     key={item._id || index}
@@ -313,7 +336,9 @@ const handleContactSubmit = async (e) => {
                       })}
                     </p>
                     <div>
-                      <h3 className={`text-2xl font-semibold tracking-tight ${mode.heading}`}>
+                      <h3
+                        className={`text-2xl font-semibold tracking-tight ${mode.heading}`}
+                      >
                         {item.position}
                       </h3>
                       <p className={`mt-1 text-sm ${mode.muted}`}>
@@ -322,7 +347,9 @@ const handleContactSubmit = async (e) => {
                         {item.isCurrent && " · Current"}
                       </p>
                       {item.description && (
-                        <p className={`mt-4 max-w-2xl leading-7 ${mode.muted}`}>{item.description}</p>
+                        <p className={`mt-4 max-w-2xl leading-7 ${mode.muted}`}>
+                          {item.description}
+                        </p>
                       )}
                     </div>
                   </article>
@@ -332,92 +359,161 @@ const handleContactSubmit = async (e) => {
           </section>
         )}
 
-        {projects.length > 0 && (
-          <section className="mx-auto max-w-6xl px-5 py-16 sm:px-8 lg:py-24">
-            <p className={`text-[11px] font-semibold uppercase tracking-[0.32em] ${theme.text}`}>
-              Projects
-            </p>
-            <h2 className={`mt-4 text-4xl font-semibold tracking-tight ${mode.heading} sm:text-5xl`}>
-              Selected work.
-            </h2>
-            <div className="mt-12 space-y-16 lg:space-y-24">
-              {projects.map((project, index) => {
-                const reverse = index % 2 === 1;
-                return (
-                  <article
-                    key={project._id || index}
-                    className={`grid items-center gap-8 lg:grid-cols-2 ${reverse ? "lg:[&>*:first-child]:order-2" : ""}`}
+       {projects.length > 0 && (
+  <section
+    id="projects"
+    className="mx-auto max-w-6xl scroll-mt-24 px-5 py-16 sm:px-8 lg:py-24"
+  >
+    <p
+      className={`text-[11px] font-semibold uppercase tracking-[0.32em] ${theme.text}`}
+    >
+      Projects
+    </p>
+
+    <h2
+      className={`mt-4 text-4xl font-semibold tracking-tight ${mode.heading} sm:text-5xl`}
+    >
+      Selected work.
+    </h2>
+
+    <div className="mt-12 space-y-16 lg:space-y-24">
+      {projects.map((project, index) => {
+        const reverse = index % 2 === 1;
+
+        return (
+          <article
+            key={project._id || index}
+            className={`grid items-center gap-8 lg:grid-cols-2 ${
+              reverse ? "lg:[&>*:first-child]:order-2" : ""
+            }`}
+          >
+            {/* Project Visual */}
+            {project.image ? (
+              <div
+                className={`overflow-hidden rounded-[1.75rem] border transition duration-500 hover:-translate-y-1 ${
+                  mode.card
+                } ${reverse ? "lg:rotate-1" : "lg:-rotate-1"}`}
+              >
+                <img
+                  src={project.image}
+                  alt={project.title}
+                  className="h-64 w-full object-cover transition duration-500 hover:scale-[1.04] sm:h-80"
+                />
+              </div>
+            ) : (
+              <div
+                className={`relative flex h-64 flex-col justify-between overflow-hidden rounded-[1.75rem] border p-7 transition duration-500 hover:-translate-y-1 sm:h-80 sm:p-8 ${mode.card} ${
+                  reverse ? "lg:rotate-1" : "lg:-rotate-1"
+                }`}
+              >
+                {/* Decorative background */}
+                <div
+                  className={`absolute -right-12 -top-12 h-40 w-40 rounded-full blur-3xl opacity-20 ${theme.soft}`}
+                />
+
+                {/* Project number */}
+                <div className="relative flex items-center justify-between">
+                  <span
+                    className={`text-xs font-semibold uppercase tracking-[0.25em] ${mode.muted}`}
                   >
-                    {project.image ? (
-                      <div className={`overflow-hidden rounded-[1.75rem] border ${mode.card} ${reverse ? "lg:rotate-1" : "lg:-rotate-1"}`}>
-                        <img
-                          src={project.image}
-                          alt={project.title}
-                          className="h-64 w-full object-cover transition duration-500 hover:scale-[1.03] sm:h-80"
-                        />
-                      </div>
-                    ) : (
-                      <div
-                        className={`flex h-64 items-end rounded-[1.75rem] border p-8 sm:h-80 ${mode.card} ${theme.soft} ${reverse ? "lg:rotate-1" : "lg:-rotate-1"}`}
-                      >
-                        <span className={`text-6xl font-semibold tracking-tight ${theme.text}`}>
-                          {String(index + 1).padStart(2, "0")}
-                        </span>
-                      </div>
-                    )}
-                    <div>
-                      <h3 className={`text-3xl font-semibold tracking-tight ${mode.heading}`}>
-                        {project.title}
-                      </h3>
-                      {project.description && (
-                        <p className={`mt-4 text-base leading-7 ${mode.muted}`}>{project.description}</p>
-                      )}
-                      {project.technologies?.length > 0 && (
-                        <div className="mt-5 flex flex-wrap gap-2">
-                          {project.technologies.map((technology, techIndex) => (
-                            <span
-                              key={`${technology}-${techIndex}`}
-                              className={`rounded-full border px-3 py-1 text-xs ${mode.card} ${mode.muted}`}
-                            >
-                              {technology}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                      {(project.projectUrl || project.githubUrl) && (
-                        <div className="mt-6 flex flex-wrap gap-5 text-sm font-semibold">
-                          {project.projectUrl && (
-                            <a
-                              href={project.projectUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className={`${theme.text} underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
-                            >
-                              Live project
-                            </a>
-                          )}
-                          {project.githubUrl && (
-                            <a
-                              href={project.githubUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className={`${mode.muted} underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
-                            >
-                              GitHub
-                            </a>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </article>
-                );
-              })}
+                    Project
+                  </span>
+
+                  <span
+                    className={`text-sm font-semibold ${theme.text}`}
+                  >
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                </div>
+
+                {/* GitHub visual */}
+                <div className="relative">
+                  <div
+                    className={`inline-flex h-14 w-14 items-center justify-center rounded-2xl border text-xl font-semibold ${theme.soft} ${theme.text}`}
+                  >
+                    {"</>"}
+                  </div>
+
+                  <p
+                    className={`mt-4 text-sm font-medium ${mode.muted}`}
+                  >
+                    GitHub project
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Project Details */}
+            <div>
+              <div>
+                <h3
+                  className={`text-3xl font-semibold tracking-tight ${mode.heading}`}
+                >
+                  {project.title}
+                </h3>
+
+                
+              </div>
+
+              {project.description && (
+                <p
+                  className={`mt-4 max-w-xl text-base leading-7 ${mode.muted}`}
+                >
+                  {project.description}
+                </p>
+              )}
+
+              {project.technologies?.length > 0 && (
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {project.technologies.map((technology, techIndex) => (
+                    <span
+                      key={`${technology}-${techIndex}`}
+                      className={`rounded-full border px-3 py-1 text-xs ${mode.card} ${mode.muted}`}
+                    >
+                      {technology}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {(project.projectUrl || project.githubUrl) && (
+                <div className="mt-7 flex flex-wrap gap-3">
+                  {project.projectUrl && (
+                    <a
+                      href={project.projectUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`rounded-lg px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 ${theme.accentBg} focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
+                    >
+                      Live project →
+                    </a>
+                  )}
+
+                  {project.githubUrl && (
+                    <a
+                      href={project.githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`rounded-lg border px-4 py-2 text-sm font-semibold transition hover:-translate-y-0.5 ${mode.ghost} focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
+                    >
+                      GitHub →
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
-          </section>
-        )}
+          </article>
+        );
+      })}
+    </div>
+  </section>
+)}
 
         {education.length > 0 && (
-          <section className={`border-y ${mode.line} ${mode.wash}`}>
+          <section
+            id="education"
+            className={`scroll-mt-24 border-y ${mode.line} ${mode.wash}`}
+          >
             <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 lg:py-24">
               <p className={`text-[11px] font-semibold uppercase tracking-[0.32em] ${theme.text}`}>
                 Education
@@ -426,9 +522,11 @@ const handleContactSubmit = async (e) => {
                 {education.map((item, index) => (
                   <article
                     key={item._id || index}
-                    className={`rounded-[1.75rem] border p-7 ${mode.card} backdrop-blur`}
+                    className={`rounded-[1.75rem] border p-7 backdrop-blur transition hover:-translate-y-1 ${mode.card}`}
                   >
-                    <h3 className={`text-2xl font-semibold tracking-tight ${mode.heading}`}>
+                    <h3
+                      className={`text-2xl font-semibold tracking-tight ${mode.heading}`}
+                    >
                       {item.degree}
                     </h3>
                     <p className={`mt-2 text-sm ${theme.text}`}>
@@ -443,7 +541,9 @@ const handleContactSubmit = async (e) => {
                       </p>
                     )}
                     {item.description && (
-                      <p className={`mt-4 leading-7 ${mode.muted}`}>{item.description}</p>
+                      <p className={`mt-4 leading-7 ${mode.muted}`}>
+                        {item.description}
+                      </p>
                     )}
                   </article>
                 ))}
@@ -453,7 +553,10 @@ const handleContactSubmit = async (e) => {
         )}
 
         {certifications.length > 0 && (
-          <section className="mx-auto max-w-6xl px-5 py-16 sm:px-8 lg:py-24">
+          <section
+            id="certifications"
+            className="mx-auto max-w-6xl scroll-mt-24 px-5 py-16 sm:px-8 lg:py-24"
+          >
             <p className={`text-[11px] font-semibold uppercase tracking-[0.32em] ${theme.text}`}>
               Certifications
             </p>
@@ -467,11 +570,16 @@ const handleContactSubmit = async (e) => {
                   <p className={`mt-1 text-sm ${theme.text}`}>
                     {item.issuer}
                     {item.issueDate && (
-                      <span className={mode.muted}> · {formatDate(item.issueDate)}</span>
+                      <span className={mode.muted}>
+                        {" "}
+                        · {formatDate(item.issueDate)}
+                      </span>
                     )}
                   </p>
                   {item.description && (
-                    <p className={`mt-3 text-sm leading-6 ${mode.muted}`}>{item.description}</p>
+                    <p className={`mt-3 text-sm leading-6 ${mode.muted}`}>
+                      {item.description}
+                    </p>
                   )}
                   {item.credentialUrl && (
                     <a
@@ -490,84 +598,63 @@ const handleContactSubmit = async (e) => {
         )}
       </main>
 
-
-              <section className={`border-y ${mode.line} ${mode.wash}`}>
+      <section
+        id="contact"
+        className={`scroll-mt-24 border-y ${mode.line} ${mode.wash}`}
+      >
         <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 lg:py-24">
-          <p
-            className={`text-[11px] font-semibold uppercase tracking-[0.32em] ${theme.text}`}
-          >
+          <p className={`text-[11px] font-semibold uppercase tracking-[0.32em] ${theme.text}`}>
             Contact
           </p>
-
           <h2
             className={`mt-4 text-4xl font-semibold tracking-tight ${mode.heading} sm:text-5xl`}
           >
             Let's connect.
           </h2>
-
           <p className={`mt-4 max-w-xl leading-7 ${mode.muted}`}>
             Have an opportunity, idea, or just want to say hello? Send a message.
           </p>
 
-          <form
-            onSubmit={handleContactSubmit}
-            className="mt-10 max-w-2xl space-y-4"
-          >
+          <form onSubmit={handleContactSubmit} className="mt-10 max-w-2xl space-y-4">
             <input
               type="text"
               placeholder="Your name"
               value={contactForm.name}
               onChange={(e) =>
-                setContactForm({
-                  ...contactForm,
-                  name: e.target.value,
-                })
+                setContactForm({ ...contactForm, name: e.target.value })
               }
               required
-              className={`w-full rounded-2xl border px-5 py-3.5 text-sm outline-none ${mode.card} ${mode.heading}`}
+              className={`w-full rounded-2xl border px-5 py-3.5 text-sm outline-none ${mode.field} focus-visible:outline-2 focus-visible:outline-offset-2 ${theme.focus}`}
             />
-
             <input
               type="email"
               placeholder="Your email"
               value={contactForm.email}
               onChange={(e) =>
-                setContactForm({
-                  ...contactForm,
-                  email: e.target.value,
-                })
+                setContactForm({ ...contactForm, email: e.target.value })
               }
               required
-              className={`w-full rounded-2xl border px-5 py-3.5 text-sm outline-none ${mode.card} ${mode.heading}`}
+              className={`w-full rounded-2xl border px-5 py-3.5 text-sm outline-none ${mode.field} focus-visible:outline-2 focus-visible:outline-offset-2 ${theme.focus}`}
             />
-
             <input
               type="text"
               placeholder="Subject"
               value={contactForm.subject}
               onChange={(e) =>
-                setContactForm({
-                  ...contactForm,
-                  subject: e.target.value,
-                })
+                setContactForm({ ...contactForm, subject: e.target.value })
               }
-              className={`w-full rounded-2xl border px-5 py-3.5 text-sm outline-none ${mode.card} ${mode.heading}`}
+              className={`w-full rounded-2xl border px-5 py-3.5 text-sm outline-none ${mode.field} focus-visible:outline-2 focus-visible:outline-offset-2 ${theme.focus}`}
             />
-
             <textarea
               placeholder="Your message"
               rows={6}
               value={contactForm.message}
               onChange={(e) =>
-                setContactForm({
-                  ...contactForm,
-                  message: e.target.value,
-                })
+                setContactForm({ ...contactForm, message: e.target.value })
               }
               required
-              className={`w-full rounded-2xl border px-5 py-3.5 text-sm outline-none ${mode.card} ${mode.heading}`}
+              className={`w-full rounded-2xl border px-5 py-3.5 text-sm outline-none ${mode.field} focus-visible:outline-2 focus-visible:outline-offset-2 ${theme.focus}`}
             />
-
             <button
               type="submit"
               disabled={contactStatus.loading}
@@ -575,19 +662,29 @@ const handleContactSubmit = async (e) => {
             >
               {contactStatus.loading ? "Sending..." : "Send Message"}
             </button>
-
             {contactStatus.success && (
-              <p className="text-sm text-emerald-500">
-                {contactStatus.success}
-              </p>
+              <p className="text-sm text-emerald-500">{contactStatus.success}</p>
             )}
-
             {contactStatus.error && (
-              <p className="text-sm text-rose-500">
-                {contactStatus.error}
-              </p>
+              <p className="text-sm text-rose-500">{contactStatus.error}</p>
             )}
           </form>
+
+          {socialLinks.length > 0 && (
+            <div className="mt-8 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+              {socialLinks.map((link) => (
+                <a
+                  key={link.key}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`${mode.muted} transition hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
+                >
+                  {link.label}
+                </a>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

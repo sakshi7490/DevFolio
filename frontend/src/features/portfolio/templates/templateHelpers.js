@@ -1,3 +1,5 @@
+import api from "../../../api/axios";
+
 export const fontClasses = {
   inter: "font-sans",
   poppins: "font-display",
@@ -35,3 +37,39 @@ export const collectSocialLinks = (social = {}) =>
     { key: "instagram", label: "Instagram", href: social?.instagram },
     { key: "website", label: "Website", href: social?.website },
   ].filter((link) => Boolean(link.href));
+
+export const getResumeTrackingUrl = (portfolio = {}) => {
+  if (!portfolio.resumeUrl || !portfolio.slug) return "";
+
+  const base = String(api.defaults.baseURL || "").replace(/\/$/, "");
+  return `${base}/portfolios/public/${portfolio.slug}/resume`;
+};
+
+export const submitPortfolioContact = (slug, contactForm) =>
+  api.post(`/contact/${slug}`, contactForm);
+
+export const buildSectionNav = ({
+  about,
+  portfolio,
+  skills = [],
+  experience = [],
+  projects = [],
+  education = [],
+  certifications = [],
+} = {}) => {
+  const items = [];
+
+  if (about?.content || portfolio?.description) {
+    items.push({ id: "about", label: "About" });
+  }
+  if (skills.length) items.push({ id: "skills", label: "Skills" });
+  if (experience.length) items.push({ id: "experience", label: "Experience" });
+  if (projects.length) items.push({ id: "projects", label: "Projects" });
+  if (education.length) items.push({ id: "education", label: "Education" });
+  if (certifications.length) {
+    items.push({ id: "certifications", label: "Certifications" });
+  }
+
+  items.push({ id: "contact", label: "Contact" });
+  return items;
+};

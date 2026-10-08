@@ -1,72 +1,89 @@
 import { useMemo, useState } from "react";
-import axios from "axios";
-
 import {
+  buildSectionNav,
   collectSocialLinks,
   fontClasses,
   formatDate,
   formatDateRange,
+  getResumeTrackingUrl,
+  submitPortfolioContact,
 } from "./templateHelpers";
 
 const themeColors = {
   orange: {
     accent: "text-orange-700",
-    accentBg: "bg-orange-700",
-    accentHover: "hover:bg-orange-800",
+    accentDark: "text-orange-400",
+    accentBg: "bg-orange-700 hover:bg-orange-800",
+    accentBgDark: "bg-orange-600 hover:bg-orange-500",
     soft: "bg-orange-50 text-orange-800",
-    ring: "ring-orange-200",
+    softDark: "bg-orange-500/15 text-orange-300",
     borderHover: "hover:border-orange-200",
+    borderHoverDark: "hover:border-orange-700/60",
     focus: "focus-visible:outline-orange-700",
+    focusDark: "focus-visible:outline-orange-400",
     bar: "bg-orange-700",
+    barDark: "bg-orange-500",
   },
   blue: {
     accent: "text-blue-700",
-    accentBg: "bg-blue-700",
-    accentHover: "hover:bg-blue-800",
+    accentDark: "text-blue-400",
+    accentBg: "bg-blue-700 hover:bg-blue-800",
+    accentBgDark: "bg-blue-600 hover:bg-blue-500",
     soft: "bg-blue-50 text-blue-800",
-    ring: "ring-blue-200",
+    softDark: "bg-blue-500/15 text-blue-300",
     borderHover: "hover:border-blue-200",
+    borderHoverDark: "hover:border-blue-700/60",
     focus: "focus-visible:outline-blue-700",
+    focusDark: "focus-visible:outline-blue-400",
     bar: "bg-blue-700",
+    barDark: "bg-blue-500",
   },
   green: {
     accent: "text-emerald-700",
-    accentBg: "bg-emerald-700",
-    accentHover: "hover:bg-emerald-800",
+    accentDark: "text-emerald-400",
+    accentBg: "bg-emerald-700 hover:bg-emerald-800",
+    accentBgDark: "bg-emerald-600 hover:bg-emerald-500",
     soft: "bg-emerald-50 text-emerald-800",
-    ring: "ring-emerald-200",
+    softDark: "bg-emerald-500/15 text-emerald-300",
     borderHover: "hover:border-emerald-200",
+    borderHoverDark: "hover:border-emerald-700/60",
     focus: "focus-visible:outline-emerald-700",
+    focusDark: "focus-visible:outline-emerald-400",
     bar: "bg-emerald-700",
+    barDark: "bg-emerald-500",
   },
   purple: {
     accent: "text-violet-700",
-    accentBg: "bg-violet-700",
-    accentHover: "hover:bg-violet-800",
+    accentDark: "text-violet-400",
+    accentBg: "bg-violet-700 hover:bg-violet-800",
+    accentBgDark: "bg-violet-600 hover:bg-violet-500",
     soft: "bg-violet-50 text-violet-800",
-    ring: "ring-violet-200",
+    softDark: "bg-violet-500/15 text-violet-300",
     borderHover: "hover:border-violet-200",
+    borderHoverDark: "hover:border-violet-700/60",
     focus: "focus-visible:outline-violet-700",
+    focusDark: "focus-visible:outline-violet-400",
     bar: "bg-violet-700",
+    barDark: "bg-violet-500",
   },
   red: {
     accent: "text-red-700",
-    accentBg: "bg-red-700",
-    accentHover: "hover:bg-red-800",
+    accentDark: "text-red-400",
+    accentBg: "bg-red-700 hover:bg-red-800",
+    accentBgDark: "bg-red-600 hover:bg-red-500",
     soft: "bg-red-50 text-red-800",
-    ring: "ring-red-200",
+    softDark: "bg-red-500/15 text-red-300",
     borderHover: "hover:border-red-200",
+    borderHoverDark: "hover:border-red-700/60",
     focus: "focus-visible:outline-red-700",
+    focusDark: "focus-visible:outline-red-400",
     bar: "bg-red-700",
+    barDark: "bg-red-500",
   },
 };
 
 const ModernProfessional = ({ data = {} }) => {
   const portfolio = data.portfolio || {};
-  const resumeTrackingUrl = portfolio.resumeUrl
-    ? `http://localhost:5000/api/v1/portfolios/public/${portfolio.slug}/resume`
-    : "";
-
   const personal = data.personal || {};
   const about = data.about || {};
   const social = data.social || {};
@@ -76,12 +93,23 @@ const ModernProfessional = ({ data = {} }) => {
   const projects = data.projects || [];
   const experience = data.experience || [];
 
+  const resumeTrackingUrl = getResumeTrackingUrl(portfolio);
   const fontClass = fontClasses[portfolio.font || "inter"];
-  const theme = themeColors[portfolio.themeColor || "orange"];
+  const palette = themeColors[portfolio.themeColor || "orange"];
   const isDark = (portfolio.themeMode || "dark") === "dark";
   const socialLinks = collectSocialLinks(social);
   const displayName = personal.name || portfolio.title || "Professional";
+  const intro = about.content || portfolio.description || "";
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const theme = {
+    accent: isDark ? palette.accentDark : palette.accent,
+    accentBg: isDark ? palette.accentBgDark : palette.accentBg,
+    soft: isDark ? palette.softDark : palette.soft,
+    borderHover: isDark ? palette.borderHoverDark : palette.borderHover,
+    focus: isDark ? palette.focusDark : palette.focus,
+    bar: isDark ? palette.barDark : palette.bar,
+  };
 
   const [contactForm, setContactForm] = useState({
     name: "",
@@ -99,25 +127,12 @@ const ModernProfessional = ({ data = {} }) => {
   const handleContactSubmit = async (e) => {
     e.preventDefault();
 
-    setContactStatus({
-      loading: true,
-      success: "",
-      error: "",
-    });
+    setContactStatus({ loading: true, success: "", error: "" });
 
     try {
-      await axios.post(
-        `http://localhost:5000/api/v1/contact/${portfolio.slug}`,
-        contactForm,
-      );
+      await submitPortfolioContact(portfolio.slug, contactForm);
 
-      setContactForm({
-        name: "",
-        email: "",
-        subject: "",
-        message: "",
-      });
-
+      setContactForm({ name: "", email: "", subject: "", message: "" });
       setContactStatus({
         loading: false,
         success: "Your message has been sent successfully.",
@@ -146,6 +161,7 @@ const ModernProfessional = ({ data = {} }) => {
         nav: "text-slate-300 hover:text-white",
         footer: "bg-slate-900 border-slate-800",
         image: "bg-slate-800",
+        field: "bg-slate-950 border-slate-700 text-slate-100 placeholder:text-slate-500",
       }
     : {
         page: "bg-[#f4f6f9] text-slate-800",
@@ -160,33 +176,30 @@ const ModernProfessional = ({ data = {} }) => {
         nav: "text-slate-600 hover:text-slate-950",
         footer: "bg-slate-900 text-white border-slate-800",
         image: "bg-slate-100",
+        field: "bg-white border-slate-200 text-slate-800 placeholder:text-slate-400",
       };
 
-  const sections = useMemo(() => {
-    const items = [];
-    if (about.content || portfolio.description)
-      items.push({ id: "about", label: "About" });
-    if (skills.length) items.push({ id: "skills", label: "Skills" });
-    if (experience.length)
-      items.push({ id: "experience", label: "Experience" });
-    if (projects.length) items.push({ id: "projects", label: "Projects" });
-    if (education.length) items.push({ id: "education", label: "Education" });
-    if (certifications.length)
-      items.push({ id: "certifications", label: "Certifications" });
-    if (socialLinks.length || portfolio.resumeUrl)
-      items.push({ id: "contact", label: "Contact" });
-    return items;
-  }, [
-    about.content,
-    portfolio.description,
-    portfolio.resumeUrl,
-    skills.length,
-    experience.length,
-    projects.length,
-    education.length,
-    certifications.length,
-    socialLinks.length,
-  ]);
+  const sections = useMemo(
+    () =>
+      buildSectionNav({
+        about,
+        portfolio,
+        skills,
+        experience,
+        projects,
+        education,
+        certifications,
+      }),
+    [
+      about,
+      portfolio,
+      skills,
+      experience,
+      projects,
+      education,
+      certifications,
+    ],
+  );
 
   const sectionNumber = (id) => {
     const index = sections.findIndex((section) => section.id === id);
@@ -195,9 +208,7 @@ const ModernProfessional = ({ data = {} }) => {
 
   const SectionLabel = ({ id, title }) => (
     <div className="md:pt-1">
-      <p
-        className={`text-[11px] font-semibold tracking-[0.22em] ${theme.accent}`}
-      >
+      <p className={`text-[11px] font-semibold tracking-[0.22em] ${theme.accent}`}>
         {sectionNumber(id)}
       </p>
       <h2
@@ -208,12 +219,16 @@ const ModernProfessional = ({ data = {} }) => {
     </div>
   );
 
+  console.log("resumeUrl:", portfolio?.resumeUrl);
+console.log("slug:", portfolio?.slug);
+console.log("resumeTrackingUrl:", resumeTrackingUrl);
+
   return (
-    <div className={`min-h-screen ${fontClass} ${mode.page} antialiased`}>
+    <div id="top" className={`min-h-screen ${fontClass} ${mode.page} antialiased`}>
       <div className={`h-1 ${theme.bar}`} />
 
       <header
-        className={`relative sticky top-0 z-30 border-b ${mode.header} backdrop-blur`}
+        className={`sticky top-0 z-30 border-b ${mode.header} backdrop-blur`}
       >
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3 sm:px-8">
           <a
@@ -232,12 +247,16 @@ const ModernProfessional = ({ data = {} }) => {
                 aria-controls="portfolio-nav"
                 onClick={() => setMenuOpen((open) => !open)}
               >
-                Menu
+                {menuOpen ? "Close" : "Menu"}
               </button>
               <nav
                 id="portfolio-nav"
                 aria-label="Page sections"
-                className={`${menuOpen ? "absolute left-0 right-0 top-full border-b px-5 py-3" : "hidden"} md:static md:flex md:border-0 md:p-0 ${mode.header} md:bg-transparent`}
+                className={`${
+                  menuOpen
+                    ? "absolute left-0 right-0 top-full border-b px-5 py-3 shadow-lg"
+                    : "hidden"
+                } md:static md:flex md:border-0 md:p-0 md:shadow-none ${mode.header} md:bg-transparent`}
               >
                 <ul className="flex flex-col gap-2 md:flex-row md:flex-wrap md:items-center md:gap-5">
                   {sections.map((section) => (
@@ -258,10 +277,8 @@ const ModernProfessional = ({ data = {} }) => {
         </div>
       </header>
 
-      <section className="mx-auto max-w-6xl px-5 py-12 sm:px-8 lg:py-16">
-        <div
-          className={`overflow-hidden rounded-2xl border shadow-sm ${mode.panel}`}
-        >
+      <section className="mx-auto max-w-6xl px-5 py-10 sm:px-8 lg:py-14">
+        <div className={`overflow-hidden rounded-2xl border shadow-sm ${mode.panel}`}>
           <div className="grid gap-8 p-6 sm:p-10 lg:grid-cols-[minmax(0,1fr)_220px] lg:items-center">
             <div>
               <p
@@ -274,19 +291,36 @@ const ModernProfessional = ({ data = {} }) => {
               >
                 {displayName}
               </h1>
+              {intro && (
+                <p
+                  className={`mt-5 max-w-2xl text-base leading-7 ${mode.text} sm:text-lg`}
+                >
+                  {intro.length > 180 ? `${intro.slice(0, 177).trim()}…` : intro}
+                </p>
+              )}
               {personal.location && (
                 <p className={`mt-4 text-sm ${mode.muted}`}>
                   {personal.location}
                 </p>
               )}
-              {(portfolio.resumeUrl || social.linkedin || social.github) && (
+              {(resumeTrackingUrl || social.linkedin || social.github) && (
                 <div className="mt-8 flex flex-wrap gap-3">
+                  {resumeTrackingUrl && (
+                    <a
+                      href={resumeTrackingUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`inline-flex items-center rounded-lg px-5 py-2.5 text-sm font-semibold text-white shadow-sm ${theme.accentBg} focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
+                    >
+                      Download Resume
+                    </a>
+                  )}
                   {social.linkedin && (
                     <a
                       href={social.linkedin}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`inline-flex items-center rounded-lg px-5 py-2.5 text-sm font-semibold text-white shadow-sm ${theme.accentBg} ${theme.accentHover} focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
+                      className={`inline-flex items-center rounded-lg border px-5 py-2.5 text-sm font-semibold ${mode.ghost} focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
                     >
                       LinkedIn
                     </a>
@@ -299,16 +333,6 @@ const ModernProfessional = ({ data = {} }) => {
                       className={`inline-flex items-center rounded-lg border px-5 py-2.5 text-sm font-semibold ${mode.ghost} focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
                     >
                       GitHub
-                    </a>
-                  )}
-                  {portfolio.resumeUrl && (
-                    <a
-                      href={resumeTrackingUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`inline-flex items-center rounded-lg border px-5 py-2.5 text-sm font-semibold ${mode.ghost} focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
-                    >
-                      Download Resume
                     </a>
                   )}
                 </div>
@@ -334,9 +358,7 @@ const ModernProfessional = ({ data = {} }) => {
           >
             <div className="grid gap-6 md:grid-cols-[180px_minmax(0,1fr)] md:gap-12">
               <SectionLabel id="about" title="About" />
-              <p
-                className={`max-w-3xl text-base leading-8 ${mode.text} sm:text-lg`}
-              >
+              <p className={`max-w-3xl text-base leading-8 ${mode.text} sm:text-lg`}>
                 {about.content || portfolio.description}
               </p>
             </div>
@@ -382,9 +404,7 @@ const ModernProfessional = ({ data = {} }) => {
                         <h3 className={`text-xl font-semibold ${mode.heading}`}>
                           {item.position}
                         </h3>
-                        <p
-                          className={`mt-1 text-sm font-medium ${theme.accent}`}
-                        >
+                        <p className={`mt-1 text-sm font-medium ${theme.accent}`}>
                           {item.company}
                           {item.location && (
                             <span className={mode.muted}>
@@ -406,7 +426,7 @@ const ModernProfessional = ({ data = {} }) => {
                         )}
                         {item.isCurrent && (
                           <span
-                            className={`rounded-full px-3 py-1 text-xs font-semibold ${isDark ? "bg-emerald-900/40 text-emerald-300" : theme.soft}`}
+                            className={`rounded-full px-3 py-1 text-xs font-semibold ${theme.soft}`}
                           >
                             Present
                           </span>
@@ -438,15 +458,45 @@ const ModernProfessional = ({ data = {} }) => {
                     key={project._id || index}
                     className={`flex flex-col overflow-hidden rounded-2xl border shadow-sm transition ${mode.panel} ${theme.borderHover} hover:shadow-md`}
                   >
-                    {project.image && (
+                    {project.image ? (
                       <div className={`border-b ${mode.line} ${mode.image}`}>
                         <img
                           src={project.image}
                           alt={project.title}
-                          className="h-44 w-full object-cover"
+                          className="h-48 w-full object-cover"
                         />
                       </div>
-                    )}
+                    ) : (
+  <div
+    className={`relative flex h-48 flex-col justify-between overflow-hidden border-b p-6 ${mode.line} ${mode.image}`}
+  >
+    <div className="flex items-center justify-between">
+      <span
+        className={`text-[10px] font-semibold uppercase tracking-[0.2em] ${mode.muted}`}
+      >
+        Project
+      </span>
+
+      <span
+        className={`text-xs font-semibold tracking-[0.18em] ${theme.accent}`}
+      >
+        {String(index + 1).padStart(2, "0")}
+      </span>
+    </div>
+
+    <div>
+      <div
+        className={`mb-2 flex h-10 w-10 items-center justify-center rounded-lg border text-sm font-semibold ${mode.chip}`}
+      >
+        {"</>"}
+      </div>
+
+      <span className={`text-xs ${mode.muted}`}>
+        GitHub project
+      </span>
+    </div>
+  </div>
+)}
                     <div className="flex flex-1 flex-col p-6">
                       <h3 className={`text-lg font-semibold ${mode.heading}`}>
                         {project.title}
@@ -520,9 +570,7 @@ const ModernProfessional = ({ data = {} }) => {
                         <h3 className={`text-xl font-semibold ${mode.heading}`}>
                           {item.degree}
                         </h3>
-                        <p
-                          className={`mt-1 text-sm font-medium ${theme.accent}`}
-                        >
+                        <p className={`mt-1 text-sm font-medium ${theme.accent}`}>
                           {item.institution}
                           {item.fieldOfStudy && (
                             <span className={mode.muted}>
@@ -555,7 +603,7 @@ const ModernProfessional = ({ data = {} }) => {
         {certifications.length > 0 && (
           <section
             id="certifications"
-            className={`scroll-mt-24 py-12 lg:py-16 ${socialLinks.length || portfolio.resumeUrl ? `border-b ${mode.line}` : ""}`}
+            className={`scroll-mt-24 border-b py-12 ${mode.line} lg:py-16`}
           >
             <div className="grid gap-6 md:grid-cols-[180px_minmax(0,1fr)] md:gap-12">
               <SectionLabel id="certifications" title="Certifications" />
@@ -599,99 +647,83 @@ const ModernProfessional = ({ data = {} }) => {
           </section>
         )}
 
-        {(socialLinks.length > 0 || portfolio.resumeUrl) && (
-          <section id="contact" className="scroll-mt-24 py-12 lg:py-16">
-            <div className="grid gap-6 md:grid-cols-[180px_minmax(0,1fr)] md:gap-12">
-              <SectionLabel id="contact" title="Contact" />
-              <div
-                className={`rounded-2xl border p-6 shadow-sm sm:p-8 ${mode.panel}`}
+        <section id="contact" className="scroll-mt-24 py-12 lg:py-16">
+          <div className="grid gap-6 md:grid-cols-[180px_minmax(0,1fr)] md:gap-12">
+            <SectionLabel id="contact" title="Contact" />
+            <div className={`rounded-2xl border p-6 shadow-sm sm:p-8 ${mode.panel}`}>
+              <p className={`max-w-xl text-sm leading-7 ${mode.text}`}>
+                Available for new opportunities. Send a message or use the
+                channels below.
+              </p>
+
+              <form
+                onSubmit={handleContactSubmit}
+                className="mt-8 max-w-2xl space-y-4"
               >
-                <p className={`max-w-xl text-sm leading-7 ${mode.text}`}>
-                  Available for new opportunities. Reach out through any of the
-                  channels below.
-                </p>
-
-                <form
-                  onSubmit={handleContactSubmit}
-                  className="mt-8 max-w-2xl space-y-4"
+                <input
+                  type="text"
+                  placeholder="Your name"
+                  value={contactForm.name}
+                  onChange={(e) =>
+                    setContactForm({ ...contactForm, name: e.target.value })
+                  }
+                  required
+                  className={`w-full rounded-lg border px-4 py-3 text-sm outline-none ${mode.field} focus-visible:outline-2 focus-visible:outline-offset-2 ${theme.focus}`}
+                />
+                <input
+                  type="email"
+                  placeholder="Your email"
+                  value={contactForm.email}
+                  onChange={(e) =>
+                    setContactForm({ ...contactForm, email: e.target.value })
+                  }
+                  required
+                  className={`w-full rounded-lg border px-4 py-3 text-sm outline-none ${mode.field} focus-visible:outline-2 focus-visible:outline-offset-2 ${theme.focus}`}
+                />
+                <input
+                  type="text"
+                  placeholder="Subject"
+                  value={contactForm.subject}
+                  onChange={(e) =>
+                    setContactForm({ ...contactForm, subject: e.target.value })
+                  }
+                  className={`w-full rounded-lg border px-4 py-3 text-sm outline-none ${mode.field} focus-visible:outline-2 focus-visible:outline-offset-2 ${theme.focus}`}
+                />
+                <textarea
+                  placeholder="Your message"
+                  rows={5}
+                  value={contactForm.message}
+                  onChange={(e) =>
+                    setContactForm({ ...contactForm, message: e.target.value })
+                  }
+                  required
+                  className={`w-full rounded-lg border px-4 py-3 text-sm outline-none ${mode.field} focus-visible:outline-2 focus-visible:outline-offset-2 ${theme.focus}`}
+                />
+                <button
+                  type="submit"
+                  disabled={contactStatus.loading}
+                  className={`rounded-lg px-5 py-2.5 text-sm font-semibold text-white ${theme.accentBg} disabled:opacity-50`}
                 >
-                  <input
-                    type="text"
-                    placeholder="Your name"
-                    value={contactForm.name}
-                    onChange={(e) =>
-                      setContactForm({ ...contactForm, name: e.target.value })
-                    }
-                    required
-                    className={`w-full rounded-lg border px-4 py-3 text-sm outline-none ${mode.panel} ${mode.text}`}
-                  />
+                  {contactStatus.loading ? "Sending..." : "Send Message"}
+                </button>
+                {contactStatus.success && (
+                  <p className="text-sm text-emerald-600">
+                    {contactStatus.success}
+                  </p>
+                )}
+                {contactStatus.error && (
+                  <p className="text-sm text-red-600">{contactStatus.error}</p>
+                )}
+              </form>
 
-                  <input
-                    type="email"
-                    placeholder="Your email"
-                    value={contactForm.email}
-                    onChange={(e) =>
-                      setContactForm({ ...contactForm, email: e.target.value })
-                    }
-                    required
-                    className={`w-full rounded-lg border px-4 py-3 text-sm outline-none ${mode.panel} ${mode.text}`}
-                  />
-
-                  <input
-                    type="text"
-                    placeholder="Subject"
-                    value={contactForm.subject}
-                    onChange={(e) =>
-                      setContactForm({
-                        ...contactForm,
-                        subject: e.target.value,
-                      })
-                    }
-                    className={`w-full rounded-lg border px-4 py-3 text-sm outline-none ${mode.panel} ${mode.text}`}
-                  />
-
-                  <textarea
-                    placeholder="Your message"
-                    rows={5}
-                    value={contactForm.message}
-                    onChange={(e) =>
-                      setContactForm({
-                        ...contactForm,
-                        message: e.target.value,
-                      })
-                    }
-                    required
-                    className={`w-full rounded-lg border px-4 py-3 text-sm outline-none ${mode.panel} ${mode.text}`}
-                  />
-
-                  <button
-                    type="submit"
-                    disabled={contactStatus.loading}
-                    className={`rounded-lg px-5 py-2.5 text-sm font-semibold text-white ${theme.accentBg} ${theme.accentHover} disabled:opacity-50`}
-                  >
-                    {contactStatus.loading ? "Sending..." : "Send Message"}
-                  </button>
-
-                  {contactStatus.success && (
-                    <p className="text-sm text-emerald-600">
-                      {contactStatus.success}
-                    </p>
-                  )}
-
-                  {contactStatus.error && (
-                    <p className="text-sm text-red-600">
-                      {contactStatus.error}
-                    </p>
-                  )}
-                </form>
-
+              {(resumeTrackingUrl || socialLinks.length > 0) && (
                 <div className="mt-6 flex flex-wrap gap-3">
-                  {portfolio.resumeUrl && (
+                  {resumeTrackingUrl && (
                     <a
                       href={resumeTrackingUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`inline-flex rounded-lg px-4 py-2.5 text-sm font-semibold text-white ${theme.accentBg} ${theme.accentHover} focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
+                      className={`inline-flex rounded-lg px-4 py-2.5 text-sm font-semibold text-white ${theme.accentBg} focus-visible:outline-2 focus-visible:outline-offset-4 ${theme.focus}`}
                     >
                       Download Resume
                     </a>
@@ -708,20 +740,17 @@ const ModernProfessional = ({ data = {} }) => {
                     </a>
                   ))}
                 </div>
-              </div>
+              )}
             </div>
-          </section>
-        )}
+          </div>
+        </section>
       </main>
 
       <footer className={`border-t ${mode.footer}`}>
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-5 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-8">
           <p className="text-sm font-medium">{portfolio.title}</p>
-          <p
-            className={`text-xs ${isDark ? "text-slate-500" : "text-slate-400"}`}
-          >
-            © {new Date().getFullYear()} All rights reserved. Built with
-            DevFolio
+          <p className={`text-xs ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+            © {new Date().getFullYear()} All rights reserved. Built with DevFolio
           </p>
         </div>
       </footer>
