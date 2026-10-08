@@ -14,12 +14,23 @@ import {
 
 import validate from "../../middleware/validation.middleware.js";
 import { protect } from "../../middleware/auth.middleware.js";
-
+import { authRateLimiter } from "../../middleware/rateLimit.middleware.js";
 const router = Router();
 
 // Public Routes
-router.post("/register", validate(registerSchema), register);
-router.post("/login", validate(loginSchema), login);
+router.post(
+  "/register",
+  authRateLimiter,
+  validate(registerSchema),
+  register
+);
+
+router.post(
+  "/login",
+  authRateLimiter,
+  validate(loginSchema),
+  login
+);
 
 // Protected Routes
 router.get("/me", protect, getMe);
