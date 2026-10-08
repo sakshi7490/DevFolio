@@ -17,6 +17,7 @@ import resumeRoutes from "../modules/resume/resume.routes.js";
 import githubRoutes from "../modules/github/github.routes.js";
 import analyticsRoutes from "../modules/analytics/analytics.routes.js";
 import contactRoutes from "../modules/contact/contact.routes.js";
+import adminRoutes from "../modules/admin/admin.routes.js";
 
 const router = Router();
 
@@ -32,6 +33,9 @@ router.get("/health", (req, res) => {
 
 // Authentication Routes
 router.use("/auth", authRoutes);
+
+//admin routes
+router.use("/admin", adminRoutes);
 
 // User Routes
 router.use("/users", userRoutes);

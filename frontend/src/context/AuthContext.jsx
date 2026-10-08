@@ -32,8 +32,10 @@ export const AuthProvider = ({ children }) => {
       try {
         const response = await getCurrentUser();
         setUser(response.data);
+        localStorage.setItem("user", JSON.stringify(response.data));
       } catch (error) {
         removeToken();
+        localStorage.removeItem("user");
         setUser(null);
       } finally {
         setLoading(false);
@@ -47,6 +49,7 @@ export const AuthProvider = ({ children }) => {
     const response = await registerService(userData);
 
     saveToken(response.data.token);
+    localStorage.setItem("user", JSON.stringify(response.data.user));
     setUser(response.data.user);
 
     return response;
@@ -56,6 +59,7 @@ export const AuthProvider = ({ children }) => {
     const response = await loginService(credentials);
 
     saveToken(response.data.token);
+    localStorage.setItem("user", JSON.stringify(response.data.user));
     setUser(response.data.user);
 
     return response;
@@ -69,11 +73,13 @@ export const AuthProvider = ({ children }) => {
     }
 
     removeToken();
+    localStorage.removeItem("user");
     setUser(null);
   };
 
   const updateUser = (updatedUser) => {
     setUser(updatedUser);
+    localStorage.setItem("user", JSON.stringify(updatedUser));
   };
 
   return (

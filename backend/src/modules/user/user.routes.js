@@ -5,6 +5,7 @@ import {
   updateUserProfile,
   getUsers,
   updateUserBlockStatus,
+  getAdminStats,
 } from "./user.controller.js";
 
 import { updateProfileSchema } from "./user.validation.js";
@@ -35,6 +36,13 @@ router.patch(
   protect,
   authorize("admin"),
   updateUserBlockStatus
+);
+
+router.get(
+  "/admin/stats",
+  protect,
+  authorize("admin"),
+  getAdminStats
 );
 
 export default router;

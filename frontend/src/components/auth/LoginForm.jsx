@@ -55,9 +55,17 @@ const LoginForm = () => {
 
     try {
       setLoading(true);
-      await login(formData);
+
+      const response = await login(formData);
+      console.log("LOGIN RESPONSE:", response.data);
+
       toast.success("Login successful!");
-      navigate("/dashboard");
+
+      if (response.data.user.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (error) {
       toast.error(error.response?.data?.message || "Login failed");
     } finally {
@@ -89,19 +97,30 @@ const LoginForm = () => {
       />
 
       <div className="-mt-2 flex justify-end">
-        <button type="button" className="text-sm font-medium text-accent hover:text-emerald-800">
+        <button
+          type="button"
+          className="text-sm font-medium text-accent hover:text-emerald-800"
+        >
           Forgot password?
         </button>
       </div>
 
-      <Button type="submit" loading={loading} loadingText="Signing in..." className="w-full">
+      <Button
+        type="submit"
+        loading={loading}
+        loadingText="Signing in..."
+        className="w-full"
+      >
         Sign in
         <ArrowRight size={16} />
       </Button>
 
       <p className="pt-1 text-center text-sm text-muted">
         New here?{" "}
-        <Link to="/register" className="font-semibold text-accent hover:text-emerald-800">
+        <Link
+          to="/register"
+          className="font-semibold text-accent hover:text-emerald-800"
+        >
           Create your DevFolio
         </Link>
       </p>

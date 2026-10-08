@@ -3,7 +3,7 @@ import useAuth from "../hooks/useAuth";
 import Spinner from "../components/common/Spinner";
 
 const PublicRoute = () => {
-  const { loading, isAuthenticated } = useAuth();
+  const { loading, user, isAuthenticated } = useAuth();
 
   if (loading) {
     return (
@@ -13,7 +13,16 @@ const PublicRoute = () => {
     );
   }
 
-  return isAuthenticated ? <Navigate to="/dashboard" replace /> : <Outlet />;
+  if (isAuthenticated) {
+    return (
+      <Navigate
+        to={user?.role === "admin" ? "/admin" : "/dashboard"}
+        replace
+      />
+    );
+  }
+
+  return <Outlet />;
 };
 
 export default PublicRoute;

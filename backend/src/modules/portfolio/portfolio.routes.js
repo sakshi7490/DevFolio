@@ -1,6 +1,7 @@
 import express from "express";
 import upload from "../../middleware/upload.middleware.js";
 import validate from "../../middleware/validation.middleware.js";
+
 import {
   createPortfolioSchema,
   updatePortfolioSettingsSchema,
@@ -14,9 +15,11 @@ import {
   deletePortfolio,
   updatePortfolioSettings,
   uploadPortfolioImage,
+    getAdminPortfolios,
+  removeAdminPortfolio,
 } from "./portfolio.controller.js";
 
-import { protect } from "../../middleware/auth.middleware.js";
+import { protect , authorize } from "../../middleware/auth.middleware.js";
 
 const router = express.Router();
 
@@ -28,6 +31,20 @@ router.get("/", protect, getUserPortfolios);
 router.get("/public/:slug", getPublicPortfolio);
 
 router.get("/public/:slug/resume", getPublicResume);
+
+router.get(
+  "/admin/all",
+  protect,
+  authorize("admin"),
+  getAdminPortfolios
+);
+
+router.delete(
+  "/admin/:portfolioId",
+  protect,
+  authorize("admin"),
+  removeAdminPortfolio
+);
 
 router.get("/:id", protect, getSinglePortfolio);
 

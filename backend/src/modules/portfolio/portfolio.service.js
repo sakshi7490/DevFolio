@@ -288,6 +288,18 @@ const updatePortfolioSettings = async (
   return portfolio;
 };
 
+const getPortfolioStats = async () => {
+  const totalPortfolios = await Portfolio.countDocuments();
+  const publishedPortfolios = await Portfolio.countDocuments({
+    status: "published",
+  });
+
+  return {
+    totalPortfolios,
+    publishedPortfolios,
+  };
+};
+
 export default {
   createPortfolio,
   getUserPortfolios,
@@ -300,4 +312,5 @@ export default {
   updatePortfolioSettings,
   uploadPortfolioImage,
   getPortfolioForReview,
+  getPortfolioStats,
 };
