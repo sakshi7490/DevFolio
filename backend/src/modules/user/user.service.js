@@ -1,5 +1,7 @@
 import { findUserById, updateUserById ,findAllUsers, } from "./user.repository.js";
 import ApiError from "../../utils/ApiError.js";
+import User from "./user.model.js";
+import portfolioService from "../portfolio/portfolio.service.js";
 
 // Get User Profile
 export const getUserProfile = async (userId) => {
@@ -40,4 +42,25 @@ export const updateUserBlockStatus = async (userId, isBlocked) => {
   }
 
   return await updateUserById(userId, { isBlocked });
+};
+
+
+export const getUserStats = async () => {
+  const totalUsers = await User.countDocuments();
+  const blockedUsers = await User.countDocuments({ isBlocked: true });
+
+  return {
+    totalUsers,
+    blockedUsers,
+  };
+};
+
+export const getAdminStats = async () => {
+  const userStats = await getUserStats();
+  const portfolioStats = await portfolioService.getPortfolioStats();
+
+  return {
+    ...userStats,
+    ...portfolioStats,
+  };
 };

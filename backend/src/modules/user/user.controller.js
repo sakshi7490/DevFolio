@@ -3,6 +3,8 @@ import {
   updateUserProfile as updateUserProfileService,
   getAllUsers as getAllUsersService,
   updateUserBlockStatus as updateUserBlockStatusService,
+  getUserStats as getUserStatsService,
+  getAdminStats as getAdminStatsService,
 } from "./user.service.js";
 
 import asyncHandler from "../../utils/asyncHandler.js";
@@ -74,10 +76,28 @@ const updateUserBlockStatus = asyncHandler(async (req, res) => {
   });
 });
 
+const getUserStats = asyncHandler(async (req, res) => {
+  const stats = await getUserStatsService();
+
+  return res.status(200).json({
+    success: true,
+    data: stats,
+  });
+});
+const getAdminStats = asyncHandler(async (req, res) => {
+  const stats = await getAdminStatsService();
+
+  return res.status(200).json({
+    success: true,
+    data: stats,
+  });
+});
+
 export {
   getUserProfile,
   updateUserProfile,
   getUsers,
   updateUserBlockStatus,
-
+  getUserStats,
+  getAdminStats,
 };
