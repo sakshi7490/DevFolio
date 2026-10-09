@@ -40,6 +40,14 @@ app.use(express.urlencoded({ extended: true }));
 // Logger
 app.use(morgan("dev"));
 
+// Health Check
+app.get("/api/health", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "DevFolio backend is running",
+  });
+});
+
 // API Routes
 app.use("/api/v1", routes);
 
