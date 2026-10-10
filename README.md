@@ -20,6 +20,25 @@ DevFolio is a full-stack web application that helps users create, customize, man
 - AI-powered features using Google Gemini
 - Protected routes and portfolio ownership checks
 
+  ## 📸 Screenshots
+
+### Dashboard
+![DevFolio Dashboard](frontend/public/screenshots/dashboard.png)
+
+### Portfolio Management
+![Portfolio Management](frontend/public/screenshots/portfolio-management.png)
+
+### Professional Theme
+![Professional Portfolio](frontend/public/screenshots/professional-theme1.png)
+![Professional Portfolio](frontend/public/screenshots/professional-theme2.png)
+
+### Creative Theme
+![Creative Portfolio](frontend/public/screenshots/creative-theme1.png)
+![Creative Portfolio](frontend/public/screenshots/creative-theme2.png)
+
+### Portfolio Settings
+![Portfolio Settings](frontend/public/screenshots/portfolio-settings.png)
+
 ## 🛠️ Tech Stack
 
 **Frontend**
