@@ -4,7 +4,7 @@ DevFolio is a full-stack web application that helps users create, customize, man
 
 ## 🌐 Live Demo
 
-- **Frontend:** devfolio-kappa-eight.vercel.app
+- **Frontend:** https://devfolio-kappa-eight.vercel.app/
 - **Backend API:** https://devfolio-backend-q3dd.onrender.com
 
 ## ✨ Features
