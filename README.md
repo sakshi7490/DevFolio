@@ -39,6 +39,25 @@ DevFolio is a full-stack web application that helps users create, customize, man
 ### Portfolio Settings
 ![Portfolio Settings](frontend/public/screenshots/portfolio-settings.png)
 
+
+## 🏗️ Architecture
+
+```mermaid
+flowchart TD
+    A["User / Browser"] --> B["React + Vite Frontend"]
+    B --> C["Express.js REST API"]
+    C --> D["Authentication & Middleware"]
+    D --> E["Backend Services"]
+
+    E --> F[("MongoDB Atlas")]
+    E --> G["Cloudinary"]
+    E --> H["Google Gemini API"]
+    E --> I["Email Service"]
+
+    B --> J["Vercel Hosting"]
+    C --> K["Render Hosting"] 
+```
+
 ## 🛠️ Tech Stack
 
 **Frontend**
