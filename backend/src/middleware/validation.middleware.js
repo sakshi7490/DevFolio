@@ -8,11 +8,13 @@ const validate = (schema) => {
       stripUnknown: true,
     });
 
-    if (error) {
-      const errors = error.details.map((detail) => detail.message);
+    
+if (error) {
+  const errors = error.details.map((detail) => detail.message);
 
-      throw new ApiError(400, "Validation failed", errors);
-    }
+  throw new ApiError(400, errors[0], errors);
+}
+
 
     // Replace request body with sanitized data
     req.body = value;
