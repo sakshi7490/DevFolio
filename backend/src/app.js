@@ -19,11 +19,15 @@ app.use(
       const allowedOrigins = [
         "http://localhost:5173",
         process.env.CLIENT_URL,
+        "https://devfolio-kappa-eight.vercel.app",
+        
       ].filter(Boolean);
 
       if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
+
+      console.error("Blocked CORS origin:", origin);
 
       return callback(new Error("Not allowed by CORS"));
     },
