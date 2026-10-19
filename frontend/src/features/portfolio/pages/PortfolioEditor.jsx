@@ -337,6 +337,27 @@ const PortfolioEditor = () => {
           </div>
         </div>
       )}
+
+      <div className="mt-8 flex items-center justify-between rounded-xl border border-stone-200 bg-white p-5">
+  <div>
+    <h3 className="text-sm font-semibold text-stone-900">
+      Content done? Let's set up your portfolio.
+    </h3>
+    <p className="mt-1 text-sm text-stone-500">
+      Review your portfolio URL and publish it when you're ready.
+    </p>
+  </div>
+
+  <button
+    type="button"
+    onClick={() =>
+      navigate(`/dashboard/portfolios/${id}/settings`)
+    }
+    className="shrink-0 rounded-lg bg-stone-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-stone-800"
+  >
+    Continue to Settings →
+  </button>
+</div>
     </div>
   );
 };

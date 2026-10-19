@@ -314,12 +314,12 @@ const ResumeImport = () => {
               </div>
 
               <button
-                type="button"
-                onClick={() => navigate(`/portfolio/${portfolioSlug}`)}
-                className="rounded-lg bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-800"
-              >
-                Go to Portfolio
-              </button>
+  type="button"
+  onClick={() => navigate(`/dashboard/portfolios/${portfolioId}/edit`)}
+  className="rounded-lg bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-800"
+>
+  Continue Editing
+</button>
             </div>
           ) : (
             <div className="flex justify-end border-t border-stone-200 pt-4">

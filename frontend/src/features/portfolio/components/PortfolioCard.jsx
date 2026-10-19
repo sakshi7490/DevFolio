@@ -4,7 +4,41 @@ import portfolioService from "../portfolioService";
 
 const PortfolioCard = ({ portfolio, onDelete }) => {
   const navigate = useNavigate();
+  const [imagePreview, setImagePreview] = useState("");
+  const [uploading, setUploading] = useState(false);
+const [uploadError, setUploadError] = useState("");
   const [deleting, setDeleting] = useState(false);
+
+
+  const handleImageUpload = async (file) => {
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    setUploadError("Please select a valid image.");
+    return;
+  }
+
+  try {
+    setUploading(true);
+    setUploadError("");
+
+    const response = await portfolioService.uploadPortfolioImage(
+      portfolio._id,
+      file
+    );
+
+    const updatedPortfolio = response.data?.data ?? response.data;
+
+    setImagePreview(updatedPortfolio.featuredImage);
+    portfolio.featuredImage = updatedPortfolio.featuredImage;
+  } catch (error) {
+    setUploadError(
+      error.response?.data?.message || "Image upload failed."
+    );
+  } finally {
+    setUploading(false);
+  }
+};
 
   const handleDelete = async () => {
     const confirmed = window.confirm(
@@ -29,18 +63,40 @@ const PortfolioCard = ({ portfolio, onDelete }) => {
   return (
     <div className="group flex flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
       <div className="h-40 overflow-hidden bg-canvas">
-        {portfolio.featuredImage ? (
-          <img
-            src={portfolio.featuredImage}
-            alt={portfolio.title}
-            className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-          />
-        ) : (
-          <div className="flex h-full items-center justify-center text-sm text-muted">
-            No preview image
-          </div>
-        )}
-      </div>
+{imagePreview || portfolio.featuredImage ? (
+  <img
+    src={imagePreview || portfolio.featuredImage}
+    alt={portfolio.title}
+    className="h-full w-full object-cover"
+  />
+) : (
+    <label className="flex h-full cursor-pointer flex-col items-center justify-center gap-2 text-sm text-muted transition hover:bg-stone-100">
+      <span className="flex h-10 w-10 items-center justify-center rounded-full border border-dashed border-stone-300 text-xl">
+        +
+      </span>
+      <span className="font-medium text-stone-700">
+        {uploading ? "Uploading..." : "Add Preview Image"}
+      </span>
+      {uploadError && (
+         <p className="px-3 py-2 text-xs text-red-600">
+          {uploadError}
+        </p>
+      )}
+
+      <input
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => {
+  const file = e.target.files?.[0];
+  if (file) handleImageUpload(file);
+  e.target.value = "";
+}}
+disabled={uploading}
+      />
+    </label>
+  )}
+</div>
 
       <div className="flex flex-1 flex-col p-5">
         <div className="flex items-start justify-between gap-3">

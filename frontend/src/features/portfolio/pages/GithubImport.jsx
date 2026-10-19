@@ -303,17 +303,17 @@ const GithubImport = () => {
               </div>
             )}
 
-            {imported && portfolioSlug && (
-              <div className="mt-6 flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => navigate(`/portfolio/${portfolioSlug}`)}
-                  className="rounded-lg bg-stone-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-stone-800"
-                >
-                  Go to Portfolio →
-                </button>
-              </div>
-            )}
+          {imported && (
+  <div className="mt-6 flex justify-end">
+    <button
+      type="button"
+      onClick={() => navigate(`/dashboard/portfolios/${id}/edit`)}
+      className="rounded-lg bg-stone-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-stone-800"
+    >
+      Continue Editing →
+    </button>
+  </div>
+)}
           </div>
         </>
       )}

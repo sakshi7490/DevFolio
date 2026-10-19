@@ -370,28 +370,59 @@ const PortfolioSettings = () => {
             </div>
           </div>
 
+          
           {/* Success message */}
-          {success && (
-            <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-              {success}
-            </div>
-          )}
+{success && (
+  <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3">
+    <p className="text-sm font-medium text-green-700">
+      {success}
+    </p>
 
-          {/* Actions */}
-          <div className="flex flex-wrap gap-3 border-t border-stone-100 pt-6">
-            <Button type="submit" loading={saving} loadingText="Saving...">
-              Save settings
-            </Button>
+    {formData.status === "published" ? (
+      <button
+        type="button"
+        onClick={() =>
+          window.open(`/portfolio/${formData.slug}`, "_blank")
+        }
+        className="mt-3 text-sm font-medium text-green-700 underline"
+      >
+        View published portfolio →
+      </button>
+    ) : (
+      <p className="mt-2 text-sm text-green-700">
+        Your portfolio is still a draft. Turn on publishing and save settings
+        to make it publicly accessible.
+      </p>
+    )}
+  </div>
+)}
 
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => navigate(`/dashboard/portfolios/${id}`)}
-              disabled={saving}
-            >
-              Cancel
-            </Button>
-          </div>
+{/* Actions */}
+<div className="flex flex-wrap gap-3 border-t border-stone-100 pt-6">
+  <Button type="submit" loading={saving} loadingText="Saving...">
+    Save settings
+  </Button>
+
+  <Button
+  type="button"
+  variant="secondary"
+  onClick={() =>
+    window.open(`/portfolio/${formData.slug}`, "_blank")
+  }
+  disabled={saving || formData.status !== "published"}
+>
+  Preview Portfolio ↗
+</Button>
+
+  <Button
+    type="button"
+    variant="secondary"
+    onClick={() => navigate(`/dashboard/portfolios/${id}`)}
+    disabled={saving}
+  >
+    Cancel
+  </Button>
+</div>
         </div>
       </form>
     </div>
