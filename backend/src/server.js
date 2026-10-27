@@ -6,6 +6,7 @@ const { default: app } = await import("./app.js");
 const { default: connectDB } = await import("./config/database.js");
 
 const PORT = process.env.PORT || 5000;
+console.log("Node.js version:", process.version);
 
 const startServer = async () => {
   try {
