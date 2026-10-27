@@ -7,6 +7,9 @@
     "dev": "nodemon --exec \"node --env-file=.env src/server.js\"",
     "start": "node src/server.js"
   },
+  "engines": {
+  "node": "24.22.1"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
